@@ -495,7 +495,7 @@ body.light-theme .decor-item {
     background: rgba(255, 255, 255, 0.05);
     border: var(--glass-border);
     border-radius: 99px;
-    color: var(--text-primary);
+    color: #ffffff !important;
     font-family: var(--font-sans);
     font-size: 1.05rem;
     font-weight: 700;
@@ -508,18 +508,10 @@ body.light-theme .decor-item {
     transition: var(--transition-smooth);
 }
 
-body.light-theme .btn-apple-secondary {
-    background: rgba(0, 0, 0, 0.03);
-}
-
 .btn-apple-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--text-secondary);
+    border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
-}
-
-body.light-theme .btn-apple-secondary:hover {
-    background: rgba(0, 0, 0, 0.06);
 }
 
 /* ====================================================
