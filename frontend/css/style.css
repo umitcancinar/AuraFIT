@@ -300,18 +300,22 @@ body.light-theme .btn-circle:hover {
    LANDING PAGE HERO & STYLING
    ==================================================== */
 .landing-hero {
-    padding: 8.5rem 1rem 6rem 1rem;
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9rem 1rem 7rem 1rem;
     text-align: center;
     position: relative;
     overflow: hidden;
-    background-image: linear-gradient(to bottom, rgba(7, 9, 19, 0.72) 0%, rgba(7, 9, 19, 0.45) 50%, rgba(7, 9, 19, 0.98) 100%), url('../assets/hero_bg.png');
+    background-image: linear-gradient(to bottom, rgba(7, 9, 19, 0.62) 0%, rgba(7, 9, 19, 0.3) 50%, rgba(7, 9, 19, 0.98) 100%), url('../assets/hero_bg.png');
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
 }
 
 body.light-theme .landing-hero {
-    background-image: linear-gradient(to bottom, rgba(245, 245, 247, 0.88) 0%, rgba(245, 245, 247, 0.65) 50%, rgba(245, 245, 247, 0.98) 100%), url('../assets/hero_bg.png');
+    background-image: linear-gradient(to bottom, rgba(245, 245, 247, 0.82) 0%, rgba(245, 245, 247, 0.55) 50%, rgba(245, 245, 247, 0.98) 100%), url('../assets/hero_bg.png');
 }
 
 /* Floating Decorative Icons (Premium Apple Style Animation) */
