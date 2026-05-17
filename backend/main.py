@@ -365,7 +365,6 @@ async def parse_link(req: LinkRequest):
         for kw in p["url_keywords"]:
             if kw in url_lower:
                 logger.info(f"Smart url match found for keyword '{kw}': {p['title']}")
-                await asyncio.sleep(1.0)
                 price = req.price if req.price > 0 else p["price"]
                 
                 return {
@@ -380,7 +379,6 @@ async def parse_link(req: LinkRequest):
                 
     # Default fallback to prevent failure
     logger.info("No URL keyword matches. Returning premium fallback product details.")
-    await asyncio.sleep(1.0)
     price = req.price if req.price > 0 else 1299.90
     return {
         "status": "success",

@@ -725,7 +725,6 @@ btnSubmitTryon.addEventListener("click", async () => {
     step3.querySelector(".step-status").innerText = activeLang === "tr" ? "Sırada..." : "In queue...";
 
     try {
-        await sleep(1500);
         step1.className = "step-item completed";
         step1.querySelector(".step-status").innerText = activeLang === "tr" ? "Tamamlandı!" : "Completed!";
         step2.className = "step-item active";
@@ -778,17 +777,12 @@ btnSubmitTryon.addEventListener("click", async () => {
             
             step2.className = "step-item completed";
             step2.querySelector(".step-status").innerText = activeLang === "tr" ? "Giydirildi!" : "Finished!";
-            step3.className = "step-item active";
-            step3.querySelector(".step-status").innerText = activeLang === "tr" ? "Gemini Analiz Ediyor..." : "Gemini Analyzing...";
-            
-            await sleep(1500);
             step3.className = "step-item completed";
             step3.querySelector(".step-status").innerText = activeLang === "tr" ? "Rapor Hazır!" : "Report Ready!";
             
             currentProductPrice = pPrice;
             renderReports(data.styling_report, pPrice);
             
-            await sleep(400);
             stateLoading.classList.add("hidden");
             stateSuccess.classList.remove("hidden");
             
