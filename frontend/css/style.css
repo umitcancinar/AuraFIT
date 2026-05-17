@@ -303,6 +303,46 @@ body.light-theme .btn-circle:hover {
     padding: 6.5rem 1rem 3.5rem 1rem;
     text-align: center;
     position: relative;
+    overflow: hidden;
+}
+
+/* Floating Decorative Icons (Premium Apple Style Animation) */
+.floating-decorations {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.decor-item {
+    position: absolute;
+    color: var(--text-secondary);
+    opacity: 0.04;
+    font-size: 1.8rem;
+    animation: floatSlow 12s infinite alternate ease-in-out;
+}
+
+body.light-theme .decor-item {
+    opacity: 0.07;
+}
+
+.item-1 { top: 15%; left: 8%; animation-delay: 0s; font-size: 2.4rem; }
+.item-2 { top: 22%; right: 10%; animation-delay: 2s; font-size: 2rem; }
+.item-3 { bottom: 18%; left: 12%; animation-delay: 4s; font-size: 2.2rem; }
+.item-4 { bottom: 30%; right: 7%; animation-delay: 1s; font-size: 1.8rem; }
+.item-5 { top: 38%; left: 82%; animation-delay: 3s; font-size: 2.6rem; }
+
+@keyframes floatSlow {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    100% {
+        transform: translateY(-25px) rotate(15deg);
+    }
 }
 
 .hero-container {
@@ -312,6 +352,8 @@ body.light-theme .btn-circle:hover {
     flex-direction: column;
     align-items: center;
     gap: 1.8rem;
+    position: relative;
+    z-index: 2;
 }
 
 .promo-badge {
@@ -347,13 +389,27 @@ body.light-theme .btn-circle:hover {
     font-weight: 900;
     line-height: 1.15;
     letter-spacing: -1.8px;
-    color: var(--text-dark);
+    background: linear-gradient(135deg, #ffffff 40%, var(--color-primary) 75%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+body.light-theme .hero-title {
+    background: linear-gradient(135deg, #1d1d1f 40%, var(--color-primary) 75%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
 }
 
 .hero-title span {
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
 }
 
 .hero-desc {
@@ -361,6 +417,19 @@ body.light-theme .btn-circle:hover {
     color: var(--text-secondary);
     max-width: 650px;
     line-height: 1.6;
+}
+
+.hero-tagline {
+    font-size: 1.05rem;
+    font-weight: 700;
+    max-width: 650px;
+    line-height: 1.5;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    margin-top: -0.5rem;
 }
 
 .hero-actions {
