@@ -12,7 +12,10 @@ logger = logging.getLogger(__name__)
 # Retrieve environmental configs
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    DATABASE_URL = "sqlite:///./aurafit.db"
+    if os.environ.get("VERCEL"):
+        DATABASE_URL = "sqlite:////tmp/aurafit.db"
+    else:
+        DATABASE_URL = "sqlite:///./aurafit.db"
     connect_args = {"check_same_thread": False}
 else:
     if DATABASE_URL.startswith("postgres://"):
