@@ -308,10 +308,27 @@ body.light-theme .btn-circle:hover {
     text-align: center;
     position: relative;
     overflow: hidden;
+}
+
+.landing-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url('../assets/hero_bg.png');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
+    filter: blur(10px) brightness(0.65);
+    transform: scale(1.05);
+    z-index: 1;
+    transition: filter 0.3s ease;
+}
+
+body.light-theme .landing-hero::before {
+    filter: blur(10px) brightness(0.95);
 }
 
 /* Glowing Neon Bottom Divider (Highlights the base of the virtual cabin) */
@@ -325,10 +342,6 @@ body.light-theme .btn-circle:hover {
     background: linear-gradient(90deg, transparent 0%, rgba(0, 122, 255, 0.5) 30%, rgba(99, 102, 241, 0.5) 70%, transparent 100%);
     box-shadow: 0 0 18px rgba(0, 122, 255, 0.6);
     z-index: 5;
-}
-
-body.light-theme .landing-hero {
-    background-image: linear-gradient(to bottom, rgba(245, 245, 247, 0.72) 0%, rgba(245, 245, 247, 0.72) 100%), url('../assets/hero_bg.png');
 }
 
 body.light-theme .landing-hero::after {
@@ -419,34 +432,36 @@ body.light-theme .decor-item {
     font-weight: 900;
     line-height: 1.15;
     letter-spacing: -1.8px;
-    background: linear-gradient(135deg, #ffffff 40%, var(--color-primary) 75%, var(--color-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-fill-color: initial !important;
 }
 
 body.light-theme .hero-title {
-    background: linear-gradient(135deg, #1d1d1f 40%, var(--color-primary) 75%, var(--color-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+    color: #1d1d1f !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-fill-color: initial !important;
 }
 
 .hero-title span {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-fill-color: transparent !important;
+    display: inline-block;
 }
 
 .hero-desc {
     font-size: 1.25rem;
-    color: var(--text-secondary);
+    color: #f5f5f7;
     max-width: 650px;
     line-height: 1.6;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 body.light-theme .hero-desc {
@@ -460,17 +475,21 @@ body.light-theme .hero-desc {
     font-weight: 700;
     max-width: 650px;
     line-height: 1.5;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+    color: #ffffff !important;
     margin-top: -0.5rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-fill-color: initial !important;
 }
 
 body.light-theme .hero-tagline {
+    color: #1d1d1f !important;
     font-weight: 800;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-fill-color: initial !important;
 }
 
 .hero-actions {
