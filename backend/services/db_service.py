@@ -75,10 +75,17 @@ def init_db():
     except Exception as e:
         logger.error(f"❌ Database initialization failed: {str(e)}")
 
+_db_initialized = False
+
 def get_db():
     """
-    Dependency generator for Database Sessions.
+    Dependency generator for Database Sessions. Lazily initializes tables.
     """
+    global _db_initialized
+    if not _db_initialized:
+        init_db()
+        _db_initialized = True
+        
     db = SessionLocal()
     try:
         yield db

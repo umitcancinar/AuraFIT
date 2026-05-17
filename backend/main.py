@@ -56,6 +56,17 @@ from services.db_service import (
     create_access_token, decode_access_token, User, TryOn
 )
 
+from fastapi.responses import JSONResponse
+
+# Global Exception Handler to ensure 100% JSON error responses (prevents HTML crash pages on Vercel)
+@app.exception_handler(Exception)
+def global_exception_handler(request, exc):
+    logger.error(f"💥 Global Exception Caught: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Uygulama sunucu hatası: {str(exc)}"}
+    )
+
 # Initialize database on startup
 @app.on_event("startup")
 def startup_event():

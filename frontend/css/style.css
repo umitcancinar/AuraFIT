@@ -57,7 +57,21 @@ body.light-theme {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Premium performance-optimized transitions and click feedback */
+button, input, select, textarea, a, .card, .panel, .tab-btn {
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    touch-action: manipulation; /* Eliminates 300ms double-tap delay on mobile/touch screens */
+}
+
+/* Instant click feedback haptics (Apple-style response) */
+button:active, 
+a.btn-apple-primary:active, 
+a.btn-apple-secondary:active,
+.tab-btn:active {
+    transform: scale(0.96) !important;
+    filter: brightness(0.9);
 }
 
 html {
