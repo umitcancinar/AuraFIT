@@ -361,6 +361,15 @@ body.dark-theme .chatbot-char {
         right: 16px;
         bottom: 100px;
     }
+    .chatbot-welcome-bubble {
+        right: 16px;
+        left: 16px;
+        width: auto;
+        bottom: 104px;
+    }
+    .chatbot-welcome-bubble::after {
+        right: 24px;
+    }
 }
 
 /* Floating Welcome Speech Bubble */
@@ -405,17 +414,34 @@ body.dark-theme .chatbot-welcome-bubble {
     position: absolute;
     top: 6px;
     right: 8px;
-    background: none;
+    background: rgba(0, 0, 0, 0.05);
     border: none;
-    font-size: 0.72rem;
-    color: var(--text-secondary);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    color: #1d1d1f;
     cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+body.dark-theme .chatbot-welcome-bubble-close {
+    background: rgba(255, 255, 255, 0.15);
+    color: #f5f5f7;
 }
 
 .chatbot-welcome-bubble-close:hover {
     opacity: 1;
+    background: rgba(0, 0, 0, 0.12);
+    transform: scale(1.05);
+}
+
+body.dark-theme .chatbot-welcome-bubble-close:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 /* Elegant CSS triangle speech arrow pointing downwards to chatbot */
