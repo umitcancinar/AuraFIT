@@ -124,7 +124,8 @@ const translations = {
         "chat_default_resp": "Harika bir kombin için buradayım! Sanal dolabınızdaki parçaları zenginleştirecek moda tüyoları isteyebilirsiniz.",
         "chat_error": "Bağlantı kurulurken bir sorun oluştu. Lütfen tekrar deneyin.",
         "btn-developer-contact": "Geliştirici İletişim",
-        "chat_bubble_hello": "Merhaba, ben asistanın Terzican! Sana yardımcı olabilirim. 🧵"
+        "chat_bubble_hello": "Merhaba, ben asistanın Terzican! Sana yardımcı olabilirim. 🧵",
+        "footer-text": "© 2026 AuraFit. Yapay zeka destekli yeni nesil sanal kabin ve akıllı e-ticaret platformu. Tüm hakları saklıdır."
     },
     en: {
         "app-title": "AuraFit - AI-Powered Virtual Try-On & E-Commerce FinTech",
@@ -229,7 +230,8 @@ const translations = {
         "chat_default_resp": "I'm here to help you style a perfect look! Ask me for any fashion advice or smart wardrobe tips.",
         "chat_error": "Connection issues occurred. Please try again.",
         "btn-developer-contact": "Contact Developer",
-        "chat_bubble_hello": "Hello, I'm Terzican, your digital tailor! How can I help you? 🧵"
+        "chat_bubble_hello": "Hello, I'm Terzican, your digital tailor! How can I help you? 🧵",
+        "footer-text": "© 2026 AuraFit. Next-generation generative AI fashion cabin & e-commerce styling platform. All rights reserved."
     }
 };
 
