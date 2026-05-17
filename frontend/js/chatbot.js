@@ -76,6 +76,10 @@
     </div>`;
 
     root.innerHTML = charSvg + `
+    <div class="chatbot-welcome-bubble" id="chatbotWelcomeBubble">
+        <button class="chatbot-welcome-bubble-close" id="chatbotWelcomeCloseBtn">✕</button>
+        <span id="chatbotWelcomeText">Merhaba, ben asistanın Terzican! Sana yardımcı olabilirim. 🧵</span>
+    </div>
     <div class="chatbot-window" id="chatbotWindow" role="dialog" aria-hidden="true">
         <div class="chatbot-header">
             <div class="chatbot-header-info">
@@ -100,6 +104,11 @@
     const messages = document.getElementById('chatbotMessages');
     const input = document.getElementById('chatbotInput');
     const sendBtn = document.getElementById('chatbotSendBtn');
+    
+    // Welcome Bubble DOM elements
+    const welcomeBubble = document.getElementById('chatbotWelcomeBubble');
+    const welcomeCloseBtn = document.getElementById('chatbotWelcomeCloseBtn');
+    const welcomeText = document.getElementById('chatbotWelcomeText');
 
     // Pupil cursor tracking formula calculations
     const pupils = toggle.querySelectorAll('.h-pupil');
@@ -189,9 +198,30 @@
         }
     }
 
+    // Show welcome bubble after 2.5 seconds on first load
+    setTimeout(() => {
+        if (welcomeBubble && windowEl && !windowEl.classList.contains('open')) {
+            const lang = window.activeLang || 'tr';
+            const transDict = window.translations ? window.translations[lang] : {};
+            if (welcomeText) {
+                welcomeText.innerHTML = transDict.chat_bubble_hello || "Merhaba, ben asistanın Terzican! Sana yardımcı olabilirim. 🧵";
+            }
+            welcomeBubble.classList.add('show');
+        }
+    }, 2500);
+
+    if (welcomeCloseBtn) {
+        welcomeCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (welcomeBubble) welcomeBubble.classList.remove('show');
+        });
+    }
+
     if (toggle) {
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (welcomeBubble) welcomeBubble.classList.remove('show');
+            
             const isOpen = windowEl.classList.toggle('open');
             if (isOpen) {
                 const lang = window.activeLang || 'tr';
@@ -245,6 +275,10 @@
         if (status && transDict.chat_status) status.textContent = transDict.chat_status;
         if (inputEl && transDict.chat_placeholder) inputEl.placeholder = transDict.chat_placeholder;
         
+        if (welcomeText && transDict.chat_bubble_hello) {
+            welcomeText.innerHTML = transDict.chat_bubble_hello;
+        }
+
         const msgs = messages.querySelectorAll('.chatbot-msg.bot');
         const userMsgs = messages.querySelectorAll('.chatbot-msg.user');
         

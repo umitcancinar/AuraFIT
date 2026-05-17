@@ -123,7 +123,8 @@ const translations = {
         "chat_greet_2": "Vücut yapınıza uygun beden kalıpları, renk kombinleri veya kıyafetlerin Cost-per-Wear yatırım getirisini bana sorabilirsiniz. Nasıl yardımcı olabilirim?",
         "chat_default_resp": "Harika bir kombin için buradayım! Sanal dolabınızdaki parçaları zenginleştirecek moda tüyoları isteyebilirsiniz.",
         "chat_error": "Bağlantı kurulurken bir sorun oluştu. Lütfen tekrar deneyin.",
-        "btn-developer-contact": "Geliştirici İletişim"
+        "btn-developer-contact": "Geliştirici İletişim",
+        "chat_bubble_hello": "Merhaba, ben asistanın Terzican! Sana yardımcı olabilirim. 🧵"
     },
     en: {
         "app-title": "AuraFit - AI-Powered Virtual Try-On & E-Commerce FinTech",
@@ -227,7 +228,8 @@ const translations = {
         "chat_greet_2": "You can ask me about matching sizes for your body, color coordinates, or cost-per-wear budget logic. How can I dress you today?",
         "chat_default_resp": "I'm here to help you style a perfect look! Ask me for any fashion advice or smart wardrobe tips.",
         "chat_error": "Connection issues occurred. Please try again.",
-        "btn-developer-contact": "Contact Developer"
+        "btn-developer-contact": "Contact Developer",
+        "chat_bubble_hello": "Hello, I'm Terzican, your digital tailor! How can I help you? 🧵"
     }
 };
 
@@ -1053,4 +1055,20 @@ function renderHistoryGrid(history) {
    ---------------------------------------------------- */
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Instant Scroll for "Sistemi İncele" button (bypasses browser smooth transitions delay)
+const btnExplore = document.querySelector('a[href="#how-it-works"]');
+if (btnExplore) {
+    btnExplore.addEventListener("click", (e) => {
+        e.preventDefault();
+        const target = document.getElementById("how-it-works");
+        if (target) {
+            const prevBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = "auto";
+            target.scrollIntoView({ behavior: "auto" });
+            document.documentElement.style.scrollBehavior = prevBehavior || "smooth";
+            history.pushState(null, null, "#how-it-works");
+        }
+    });
 }
