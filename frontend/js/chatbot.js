@@ -7,8 +7,11 @@
         document.body.appendChild(root); 
     }
 
-    // Determine correct API relative URL
-    const API_URL = '/api';
+    // Determine correct API URL
+    const API_BASE = window.location.origin.includes("localhost") || window.location.origin.includes("127.0.0.1") 
+        ? "http://localhost:8000" 
+        : "";
+    const API_URL = `${API_BASE}/api`;
     
     // Premium SVG Design: Elite Personal Digital Tailor Character
     const charSvg = `
