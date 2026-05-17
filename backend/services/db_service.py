@@ -11,12 +11,19 @@ logger = logging.getLogger(__name__)
 
 # Retrieve environmental configs
 DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///./aurafit.db"
+    connect_args = {"check_same_thread": False}
+else:
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    connect_args = {}
+
 JWT_SECRET = os.getenv("JWT_SECRET", "aurafit-super-secret-key-hackathon")
 JWT_ALGORITHM = "HS256"
 
 # SQLAlchemy setup
-# Use connect_args only for SQLite, for Postgres sslmode is in query params
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

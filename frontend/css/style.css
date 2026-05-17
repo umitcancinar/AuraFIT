@@ -2035,13 +2035,55 @@ body.light-theme .history-card:hover {
 }
 
 /* Footer Styling */
+/* Footer Styling */
 .app-footer {
     border-top: var(--glass-border);
-    padding: 2rem;
-    text-align: center;
+    padding: 1.8rem 2.5rem;
     font-size: 0.85rem;
     color: var(--text-secondary);
     margin-top: 4.5rem;
+    background: var(--bg-surface);
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.btn-dev-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: #ffffff !important;
+    text-decoration: none !important;
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.btn-dev-contact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+}
+
+.btn-dev-contact i {
+    font-size: 0.78rem;
+}
+
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
 }
 
 /* ----------------------------------------------------

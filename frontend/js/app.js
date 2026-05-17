@@ -122,7 +122,8 @@ const translations = {
         "chat_greet_1": "Merhaba! Ben AuraFit dijital terzi asistanınız. 🧵",
         "chat_greet_2": "Vücut yapınıza uygun beden kalıpları, renk kombinleri veya kıyafetlerin Cost-per-Wear yatırım getirisini bana sorabilirsiniz. Nasıl yardımcı olabilirim?",
         "chat_default_resp": "Harika bir kombin için buradayım! Sanal dolabınızdaki parçaları zenginleştirecek moda tüyoları isteyebilirsiniz.",
-        "chat_error": "Bağlantı kurulurken bir sorun oluştu. Lütfen tekrar deneyin."
+        "chat_error": "Bağlantı kurulurken bir sorun oluştu. Lütfen tekrar deneyin.",
+        "btn-developer-contact": "Geliştirici İletişim"
     },
     en: {
         "app-title": "AuraFit - AI-Powered Virtual Try-On & E-Commerce FinTech",
@@ -225,9 +226,14 @@ const translations = {
         "chat_greet_1": "Hello! I am your AuraFit digital tailor assistant. 🧵",
         "chat_greet_2": "You can ask me about matching sizes for your body, color coordinates, or cost-per-wear budget logic. How can I dress you today?",
         "chat_default_resp": "I'm here to help you style a perfect look! Ask me for any fashion advice or smart wardrobe tips.",
-        "chat_error": "Connection issues occurred. Please try again."
+        "chat_error": "Connection issues occurred. Please try again.",
+        "btn-developer-contact": "Contact Developer"
     }
 };
+
+// Bind translation state globally to the window object for chatbot accessibility
+window.activeLang = activeLang;
+window.translations = translations;
 
 // DOM Elements
 const userTemplates = document.querySelectorAll("#user-templates .template-card");
@@ -344,7 +350,12 @@ function setSystemTheme(theme) {
 
 function setSystemLanguage(lang) {
     activeLang = lang;
-    btnLangToggles.forEach(btn => btn.innerText = lang.toUpperCase());
+    window.activeLang = lang;
+    btnLangToggles.forEach(btn => {
+        btn.innerHTML = lang === "tr" 
+            ? `<span style="font-size:1.1rem; margin-right:4px;">🇹🇷</span> TR` 
+            : `<span style="font-size:1.1rem; margin-right:4px;">🇺🇸</span> EN`;
+    });
     localStorage.setItem("lang", lang);
     
     // Perform 100% data-i18n Translation on DOM
