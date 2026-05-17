@@ -36,13 +36,23 @@ app.add_middleware(
 
 # Setup workspace directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
-OUTPUTS_DIR = os.path.join(BASE_DIR, "uploads", "outputs")
-ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 
-os.makedirs(UPLOADS_DIR, exist_ok=True)
-os.makedirs(OUTPUTS_DIR, exist_ok=True)
-os.makedirs(ASSETS_DIR, exist_ok=True)
+if os.environ.get("VERCEL"):
+    UPLOADS_DIR = "/tmp/uploads"
+    OUTPUTS_DIR = "/tmp/uploads/outputs"
+    ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+else:
+    UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
+    OUTPUTS_DIR = os.path.join(BASE_DIR, "uploads", "outputs")
+    ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+
+try:
+    os.makedirs(UPLOADS_DIR, exist_ok=True)
+    os.makedirs(OUTPUTS_DIR, exist_ok=True)
+    if not os.environ.get("VERCEL"):
+        os.makedirs(ASSETS_DIR, exist_ok=True)
+except Exception as e:
+    print(f"Directory creation warning (safely ignored for Vercel): {str(e)}")
 
 # Mount Static Files
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
