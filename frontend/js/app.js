@@ -14,7 +14,7 @@ let parsedProductImage = null; // Stored if parsed from URL
 let currentProductPrice = 0.0;
 
 // SaaS State variables
-let activeTheme = "light"; // light (default) or dark
+let activeTheme = "dark"; // dark (default) or light
 let activeLang = "tr"; // tr (default) or en
 let authToken = localStorage.getItem("token") || null;
 let currentUser = null;
@@ -328,7 +328,7 @@ const btnLangToggles = document.querySelectorAll(".btn-lang-toggle");
    ---------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
     // Load Saved Theme
-    const savedTheme = localStorage.getItem("theme") || "light";
+    const savedTheme = localStorage.getItem("theme") || "dark";
     setSystemTheme(savedTheme);
     
     // Load Saved Language
