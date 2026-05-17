@@ -171,3 +171,27 @@ JSON Şeması:
                 "roi_verdict": f"Bu kıyafet {price} TL'lik fiyatıyla, giyim başına maliyet analizine göre oldukça mantıklı bir yatırım. Düzenli kullanıldığında giyim başı maliyeti {round(price / 30, 2)} TL seviyelerine düşüyor ve gardırobunuzdaki temel parçalarla rahatça eşleşerek kendini hızla amorti ediyor."
             }
         }
+
+async def get_chatbot_reply(user_message: str, lang: str = "tr") -> str:
+    """
+    Generates intelligent tailor/fashion styling advice from Gemini.
+    """
+    try:
+        model = genai.GenerativeModel(get_model_name())
+        system_instruction = """
+You are "AuraFit Terzi Asistanı" (AuraFit Tailor Assistant), a warm, elite digital tailor, master fashion designer, and smart budget shopper assistant.
+Your goal is to answer fashion questions, styling combination advice, fit size selections, and cost-per-wear budget logic.
+Make your responses brief (maximum 2-3 sentences), highly friendly, elegant, and extremely helpful.
+Respond strictly in the language requested (TR for Turkish, EN for English).
+Do not output markdown code blocks. Just plain styling advice text.
+"""
+        prompt = f"{system_instruction}\nUser Message: {user_message}\nRequested Language: {lang.upper()}\nReply:"
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        logger.error(f"Error in get_chatbot_reply: {str(e)}")
+        if lang == "tr":
+            return "Merhaba! Harika bir stil için buradayım. Sanal kabine kıyafet yükleyerek veya link girerek Gemini analiziyle giydirmeyi anında başlatabiliriz!"
+        else:
+            return "Hello! I am here to help you design a gorgeous look. Let's upload clothes or paste links to start visual try-on immediately!"
+

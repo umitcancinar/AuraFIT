@@ -48,9 +48,9 @@ const translations = {
         "garment-red-sweater": "Kırmızı Kazak",
         "garment-green-dress": "Yeşil Elbise",
         "btn-submit-tryon": "SANAL KABİNİ BAŞLAT",
-        "promo-badge": "Yapay Zeka Destekli Geleceğin Alışverişi",
-        "hero-main-title": "Geleceğin Akıllı Sanal Kabini AuraFit ile Tanışın",
-        "promo-subtitle": "Sanal Giydirme Teknolojisi ve Gemini Akıllı Finansal CPW Analizi ile Akıllı Alışveriş Çağını Keşfedin!",
+        "promo-badge": "Yapay Zeka Destekli Geleceğin E-Ticareti",
+        "hero-main-title": "Geleceğin Akıllı E-Ticaret Kabini AuraFit ile Tanışın",
+        "promo-subtitle": "Sanal Giydirme Teknolojisi ve Gemini Akıllı Finansal CPW Analizi ile Akıllı E-Ticaret Çağını Keşfedin!",
         "btn-start": "Sanal Kabini Keşfet",
         "btn-explore": "Sistemi İncele",
         "demo-title": "Önizleme Kabini",
@@ -69,7 +69,7 @@ const translations = {
         "promo-s1": "İster hızlı şablon mankenlerden birini seçin, isterseniz kendi boydan fotoğrafınızı sisteme yükleyin.",
         "promo-s2": "E-ticaret sitesinden beğendiğiniz bir ürünün linkini yapıştırın veya direkt kıyafet resmini ekleyin.",
         "promo-s3": "Sanal Kabin motorunu çalıştırıp giydirme sonucunu slider ile kaydırın ve interaktif ROI hesaplayıcıyı deneyin.",
-        "cta-title": "AuraFit ile Akıllı Alışveriş Çağını Hemen Başlatın",
+        "cta-title": "AuraFit ile Akıllı E-Ticaret Çağını Hemen Başlatın",
         "cta-desc": "Ücretsiz kayıt olun, sanal dolabınızı doldurun ve verilerinizi Neon veritabanınızda kalıcı saklayın.",
         "btn-login-now": "Hemen Giriş Yap / Üye Ol",
         "empty-title": "Sanal Kabin Hazır",
@@ -113,7 +113,14 @@ const translations = {
         "reg-sub": "Akıllı kabin ve bütçe ROI analizlerini kullanmaya başlayın.",
         "btn-register-action": "KAYIT OL VE GİRİŞ YAP",
         "hist-header": "Kişisel Sanal Kabin Arşiviniz",
-        "hist-sub": "PostgreSQL Neon DB'de güvenle saklanan önceki denemeleriniz."
+        "hist-sub": "PostgreSQL Neon DB'de güvenle saklanan önceki denemeleriniz.",
+        "chat_title": "Terzi AI Asistanı",
+        "chat_status": "Çevrimiçi | Stil & Kalıp Uzmanı",
+        "chat_placeholder": "Kombin, beden veya stil sorusu sorun...",
+        "chat_greet_1": "Merhaba! Ben AuraFit dijital terzi asistanınız. 🧵",
+        "chat_greet_2": "Vücut yapınıza uygun beden kalıpları, renk kombinleri veya kıyafetlerin Cost-per-Wear yatırım getirisini bana sorabilirsiniz. Nasıl yardımcı olabilirim?",
+        "chat_default_resp": "Harika bir kombin için buradayım! Sanal dolabınızdaki parçaları zenginleştirecek moda tüyoları isteyebilirsiniz.",
+        "chat_error": "Bağlantı kurulurken bir sorun oluştu. Lütfen tekrar deneyin."
     },
     en: {
         "app-title": "AuraFit - AI-Powered Virtual Try-On & E-Commerce FinTech",
@@ -144,8 +151,8 @@ const translations = {
         "garment-red-sweater": "Red Sweater",
         "garment-green-dress": "Green Dress",
         "btn-submit-tryon": "START VIRTUAL TRY-ON",
-        "promo-badge": "Next-Gen AI-Powered E-Commerce",
-        "hero-main-title": "Meet the Future Smart Virtual Closet AuraFit",
+        "promo-badge": "AI-Powered Future of E-Commerce",
+        "hero-main-title": "Future of E-Commerce: Meet AuraFit Smart Virtual Closet",
         "promo-subtitle": "Explore the age of smart e-commerce with VTON virtual try-on and Gemini financial Cost-per-Wear ROI analysis!",
         "btn-start": "Explore Virtual Closet",
         "btn-explore": "Explore System",
@@ -209,7 +216,14 @@ const translations = {
         "reg-sub": "Start trying clothes on yourself and auditing financial returns.",
         "btn-register-action": "REGISTER & SIGN IN",
         "hist-header": "Your Personal Kabin Archives",
-        "hist-sub": "Previous trials safely synced to our Neon PostgreSQL database."
+        "hist-sub": "Previous trials safely synced to our Neon PostgreSQL database.",
+        "chat_title": "Tailor AI Assistant",
+        "chat_status": "Online | Fit & Styling Expert",
+        "chat_placeholder": "Ask about styling, fit or size...",
+        "chat_greet_1": "Hello! I am your AuraFit digital tailor assistant. 🧵",
+        "chat_greet_2": "You can ask me about matching sizes for your body, color coordinates, or cost-per-wear budget logic. How can I dress you today?",
+        "chat_default_resp": "I'm here to help you style a perfect look! Ask me for any fashion advice or smart wardrobe tips.",
+        "chat_error": "Connection issues occurred. Please try again."
     }
 };
 
@@ -346,6 +360,9 @@ function setSystemLanguage(lang) {
             el.placeholder = translations[lang][key];
         }
     });
+
+    // Dispatch custom event to notify components like chatbot
+    window.dispatchEvent(new CustomEvent("langChanged", { detail: lang }));
 }
 
 // Bind Theme Switchers

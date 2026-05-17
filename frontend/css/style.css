@@ -432,12 +432,14 @@ body.light-theme .btn-apple-secondary:hover {
     letter-spacing: -0.8px;
     color: var(--text-dark);
     margin-bottom: 0.6rem;
+    text-align: center;
 }
 
 .section-desc {
     font-size: 1.05rem;
     color: var(--text-secondary);
     margin-bottom: 3.5rem;
+    text-align: center;
 }
 
 .max-width-md {
@@ -1325,6 +1327,12 @@ body.light-theme .step-item {
     z-index: 10;
 }
 
+@keyframes horizontal-sway {
+    0%, 100% { transform: translate(-50%, -50%) translateX(0); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    25% { transform: translate(-50%, -50%) translateX(-4px); box-shadow: 0 5px 20px rgba(0, 122, 255, 0.4); }
+    75% { transform: translate(-50%, -50%) translateX(4px); box-shadow: 0 5px 20px rgba(0, 122, 255, 0.4); }
+}
+
 .slider-button {
     position: absolute;
     top: 50%;
@@ -1341,10 +1349,12 @@ body.light-theme .step-item {
     color: var(--bg-base);
     font-size: 0.9rem;
     transition: transform 0.2s;
+    animation: horizontal-sway 2.5s infinite ease-in-out;
 }
 
 .compare-slider-bar:hover .slider-button {
     transform: translate(-50%, -50%) scale(1.1);
+    animation-play-state: paused;
 }
 
 /* Badges for labels */

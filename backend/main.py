@@ -49,7 +49,7 @@ app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 # Import Services
-from services.gemini_service import optimize_vton_prompt, generate_styling_and_roi_report
+from services.gemini_service import optimize_vton_prompt, generate_styling_and_roi_report, get_chatbot_reply
 from services.vton_service import run_vton
 from services.db_service import (
     get_db, init_db, hash_password, verify_password, 
@@ -68,6 +68,10 @@ def startup_event():
 class LinkRequest(BaseModel):
     url: str
     price: float = 0.0
+
+class ChatRequest(BaseModel):
+    message: str
+    lang: str = "tr"
 
 class UserRegister(BaseModel):
     username: str
@@ -389,3 +393,19 @@ async def parse_link(req: LinkRequest):
         "image_url": "/assets/garment_blue_jacket.jpg",
         "simulated": True
     }
+
+@app.post("/api/chat")
+async def chat_endpoint(req: ChatRequest):
+    """
+    Intelligent chatbot endpoint powered by Gemini tailor advisor.
+    """
+    try:
+        reply = await get_chatbot_reply(req.message, req.lang)
+        return {
+            "status": "success",
+            "response": reply
+        }
+    except Exception as e:
+        logger.error(f"Error in chat_endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
