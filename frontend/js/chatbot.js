@@ -13,7 +13,7 @@
         : "";
     const API_URL = `${API_BASE}/api`;
     
-    // Premium SVG Design: Elite Milan Fashion Designer & Stylist
+    // Premium SVG Design: Elite Milan Fashion Designer & Stylist with Separated Head & Suit Body
     const charSvg = `
     <div class="chatbot-char" id="chatbotChar" title="AuraFit Modacı & Terzi Asistanı">
         <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,52 +22,56 @@
                     <stop offset="0%" stop-color="#2e3a4e"/>
                     <stop offset="100%" stop-color="#0f172a"/>
                 </linearGradient>
+                <linearGradient id="headGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="100%" stop-color="#f1f5f9"/>
+                </linearGradient>
             </defs>
             
-            <!-- Charcoal Double-Breasted Designer Suit Body -->
-            <path d="M40 10C56 10 70 20 72 38C74 54 66 70 52 76C42 79 30 78 20 72C10 66 6 52 8 38C10 20 24 10 40 10Z" fill="url(#suitGrad)"/>
+            <!-- Charcoal Double-Breasted Designer Suit Body (Separated below the head) -->
+            <path d="M16 43 C20 40, 24 40, 40 40 C56 40, 60 40, 64 43 L66 78 C66 79, 62 80, 40 80 C18 80, 14 79, 14 78 Z" fill="url(#suitGrad)"/>
             
             <!-- Crisp White V-Neck Dress Shirt Collar -->
-            <path d="M30 14 L40 32 L50 14 L40 22 Z" fill="#ffffff"/>
+            <path d="M33 40 L40 56 L47 40 Z" fill="#ffffff"/>
             
             <!-- Elegant Red Silk Designer Necktie -->
-            <path d="M38 22 L42 22 L44 40 L40 46 L36 40 Z" fill="#ef4444"/>
-            <circle cx="40" cy="23" r="2.5" fill="#b91c1c"/>
+            <path d="M38 50 L42 50 L43.5 66 L40 71 L36.5 66 Z" fill="#ef4444"/>
+            <circle cx="40" cy="51" r="2" fill="#b91c1c"/>
             
-            <!-- Sleek Charcoal Lapels with Accent Lining -->
-            <path d="M26 14 L36 32 M54 14 L44 32" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="34" cy="28" r="1.5" fill="#fbbf24"/> <!-- Gold Stylist Accent Pin -->
+            <!-- Sleek Charcoal Lapels with Accent Pin -->
+            <path d="M26 40 L36 56 M54 40 L44 56" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="33" cy="50" r="1.2" fill="#fbbf24"/> <!-- Gold Stylist Accent Pin -->
             
             <!-- Tailor Measuring Tape (Yellow/Gold) wrapped elegantly around shoulders -->
-            <path d="M22 26 C28 22, 52 22, 58 26 C61 38, 52 48, 48 56 M22 26 C19 38, 28 48, 32 56" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M48 56 L47 62 M32 56 L33 62" stroke="#d97706" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M23 42 C28 38, 52 38, 57 42 C59 52, 52 64, 48 72 M23 42 C20 52, 27 64, 31 72" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M48 72 L47 78 M31 72 L32 78" stroke="#d97706" stroke-width="2.5" stroke-linecap="round"/>
             
-            <!-- Stylized Sewing Needle details -->
-            <path d="M11 26 L16 16" stroke="rgba(255,255,255,0.8)" stroke-width="1.8" stroke-linecap="round"/>
-            
-            <!-- Dark Designer Suit Sleeves / Waving Arms -->
-            <g class="h-arm-l" style="transform-origin: 12px 42px;">
-                <path d="M8 44 C-2 36, 0 28, 2 24" stroke="#2e3a4e" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <!-- Dark Designer Suit Sleeves / Waving Arms (Anchored at shoulders) -->
+            <g class="h-arm-l" style="transform-origin: 16px 45px;">
+                <path d="M12 45 C4 42, 4 32, 6 26" stroke="#2e3a4e" stroke-width="4.5" stroke-linecap="round" fill="none"/>
             </g>
-            <g class="h-arm-r" style="transform-origin: 68px 42px;">
-                <path d="M72 44 C82 36, 80 28, 78 24" stroke="#2e3a4e" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <g class="h-arm-r" style="transform-origin: 64px 45px;">
+                <path d="M68 45 C76 42, 76 32, 74 26" stroke="#2e3a4e" stroke-width="4.5" stroke-linecap="round" fill="none"/>
             </g>
             
-            <!-- Moving Interactive Eyes -->
-            <ellipse class="h-eye" cx="28" cy="35" rx="7" ry="9" fill="white"/>
-            <circle class="h-pupil" cx="28" cy="35" r="4.2" fill="#1D1D1F"/>
+            <!-- Elegant Separated Designer Head -->
+            <circle cx="40" cy="26" r="16" fill="url(#headGrad)" stroke="#e2e8f0" stroke-width="1.5"/>
             
-            <ellipse class="h-eye" cx="52" cy="35" rx="7" ry="9" fill="white"/>
-            <circle class="h-pupil" cx="52" cy="35" r="4.2" fill="#1D1D1F"/>
+            <!-- Moving Interactive Eyes (Inside the head) -->
+            <ellipse class="h-eye" cx="30" cy="26" rx="6.2" ry="7.8" fill="white"/>
+            <circle class="h-pupil" cx="30" cy="26" r="3.8" fill="#1D1D1F"/>
             
-            <!-- Ultra-Chic Gold Stylist Glasses -->
-            <circle cx="28" cy="35" r="9" fill="none" stroke="#f59e0b" stroke-width="1.6"/>
-            <circle cx="52" cy="35" r="9" fill="none" stroke="#f59e0b" stroke-width="1.6"/>
-            <line x1="37" y1="35" x2="43" y2="35" stroke="#f59e0b" stroke-width="1.6" stroke-linecap="round"/>
+            <ellipse class="h-eye" cx="50" cy="26" rx="6.2" ry="7.8" fill="white"/>
+            <circle class="h-pupil" cx="50" cy="26" r="3.8" fill="#1D1D1F"/>
             
-            <!-- Smiling / Excited Mouths -->
-            <path class="h-mouth" id="charMouth" d="M32 52 Q40 58 48 52" stroke="#1D1D1F" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-            <ellipse class="h-mouth-excited" cx="40" cy="54" rx="6" ry="7" fill="#1D1D1F" opacity="0"/>
+            <!-- Ultra-Chic Gold Stylist Glasses (On the head) -->
+            <circle cx="30" cy="26" r="8.2" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+            <circle cx="50" cy="26" r="8.2" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+            <line x1="38" y1="26" x2="42" y2="26" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+            
+            <!-- Smiling / Excited Mouths (On the head) -->
+            <path class="h-mouth" id="charMouth" d="M34 35 Q40 40 46 35" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <ellipse class="h-mouth-excited" cx="40" cy="36" rx="4.5" ry="5.5" fill="#1D1D1F" opacity="0"/>
         </svg>
     </div>`;
 
