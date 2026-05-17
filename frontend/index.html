@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app-title">AuraFit - Yapay Zeka Destekli Sanal Kabin ve Akıllı Alışveriş Asistanı</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Premium Glowing Background Spheres -->
+    <div class="background-glows">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+    </div>
+
+    <!-- ====================================================
+         1. PUBLIC LANDING VIEW (Unauthenticated Users)
+         ==================================================== -->
+    <div id="view-landing" class="view-wrapper">
+        <!-- Landing Header -->
+        <header class="app-header">
+            <div class="header-container">
+                <div class="logo">
+                    <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+                    <span class="logo-text">Aura<span>Fit</span></span>
+                </div>
+                
+                <div class="header-controls">
+                    <button type="button" class="btn-circle btn-theme-toggle" title="Tema Değiştir">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <button type="button" class="btn-circle btn-lang-toggle" title="Language / Dil">
+                        TR
+                    </button>
+                    <button type="button" class="btn-auth btn-show-auth-modal">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span data-i18n="btn-login-reg">Giriş / Üye Ol</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Landing Hero Section -->
+        <section class="landing-hero">
+            <div class="hero-container">
+                <div class="promo-badge">
+                    <span class="badge-glow-dot"></span>
+                    <span data-i18n="promo-badge">Yapay Zeka Destekli Geleceğin Alışverişi</span>
+                </div>
+                <h1 class="hero-title" data-i18n="hero-main-title">
+                    Geleceğin Akıllı Sanal Kabini <br><span>AuraFit</span> ile Tanışın
+                </h1>
+                <p class="hero-desc" data-i18n="promo-subtitle">
+                    Sanal Giydirme Teknolojisi ve Gemini Akıllı Finansal CPW Analizi ile Akıllı Alışveriş Çağını Keşfedin!
+                </p>
+                <div class="hero-actions">
+                    <button type="button" class="btn-apple-primary btn-show-auth-modal">
+                        <span data-i18n="btn-start">Sanal Kabini Keşfet</span>
+                        <i class="fa-solid fa-circle-play"></i>
+                    </button>
+                    <a href="#how-it-works" class="btn-apple-secondary">
+                        <span data-i18n="btn-explore">Sistemi İncele</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Demo Feature Showcase -->
+        <section class="demo-showcase">
+            <div class="section-container">
+                <h2 class="section-title" data-i18n="demo-title">Önizleme Kabini</h2>
+                <p class="section-desc" data-i18n="demo-desc">AuraFit'in sanal olarak birleştirdiği manken ve kıyafet sonucuna canlı olarak göz atın.</p>
+                
+                <div class="vton-visualizer-container max-width-md">
+                    <div class="image-compare-wrapper" id="landing-compare-slider">
+                        <img src="assets/model_woman.jpg" alt="Original" class="compare-img compare-before">
+                        <div class="compare-after-wrapper" id="landing-after-wrapper">
+                            <img src="assets/result_woman_green_dress.jpg" alt="Try-On" class="compare-img compare-after">
+                        </div>
+                        <div class="compare-slider-bar" id="landing-slider-bar">
+                            <div class="slider-button"><i class="fa-solid fa-left-right"></i></div>
+                        </div>
+                        <span class="compare-label label-before" data-i18n="label-orig">Orijinal</span>
+                        <span class="compare-label label-after" data-i18n="label-tryon">AuraFit Kabin</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section class="features-section">
+            <div class="section-container">
+                <h2 class="section-title" data-i18n="features-title">Neler Yapıyoruz?</h2>
+                <div class="features-grid">
+                    <div class="feat-card glass-panel">
+                        <div class="feat-icon-container bg-blue">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h3 data-i18n="promo-w-title">Yapay Zeka Giydirme</h3>
+                        <p data-i18n="feat-vton-desc">Kopyaladığınız herhangi bir e-ticaret linkini veya kendi yüklediğiniz kıyafeti bulut GPU sunucularımızda mankenin üzerinde kusursuz birleştirir.</p>
+                    </div>
+
+                    <div class="feat-card glass-panel">
+                        <div class="feat-icon-container bg-green">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <h3 data-i18n="rep-fin-title-h">Akıllı Finansal ROI</h3>
+                        <p data-i18n="feat-roi-desc">Cost-per-Wear (Giyim Başı Maliyet) simülatörümüz sayesinde kıyafetin gardırobunuzda kendini kaç giyimde amorti edeceğini raporlar.</p>
+                    </div>
+
+                    <div class="feat-card glass-panel">
+                        <div class="feat-icon-container bg-purple">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <h3 data-i18n="rep-sty-t">Gemini Stil Danışmanı</h3>
+                        <p data-i18n="feat-gemini-desc">Model ve kıyafet arasındaki renk kontrastını, vücut tipini ve beden kalıplarını analiz ederek size tamamlayıcı parça önerileri sunar.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Timeline -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="section-container">
+                <h2 class="section-title" data-i18n="promo-h-title">Nasıl Çalışır?</h2>
+                <div class="steps-grid">
+                    <div class="step-card glass-panel">
+                        <span class="step-num">01</span>
+                        <h3 data-i18n="step1-title">Fotoğraf Yükle</h3>
+                        <p data-i18n="promo-s1">İster hızlı şablon mankenlerden birini seçin, isterseniz kendi boydan fotoğrafınızı sisteme yükleyin.</p>
+                    </div>
+                    <div class="step-card glass-panel">
+                        <span class="step-num">02</span>
+                        <h3 data-i18n="step2-title">Kıyafet Tanımla</h3>
+                        <p data-i18n="promo-s2">E-ticaret sitesinden beğendiğiniz bir ürünün linkini yapıştırın veya direkt kıyafet resmini ekleyin.</p>
+                    </div>
+                    <div class="step-card glass-panel">
+                        <span class="step-num">03</span>
+                        <h3 data-i18n="step3-title">Raporları Çözümle</h3>
+                        <p data-i18n="promo-s3">Sanal Kabin motorunu çalıştırıp giydirme sonucunu slider ile kaydırın ve interaktif ROI hesaplayıcıyı deneyin.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Action Page Banner -->
+        <section class="cta-banner">
+            <div class="section-container">
+                <h2 data-i18n="cta-title">AuraFit ile Akıllı Alışveriş Çağını Hemen Başlatın</h2>
+                <p data-i18n="cta-desc">Ücretsiz kayıt olun, sanal dolabınızı doldurun ve verilerinizi Neon veritabanınızda kalıcı saklayın.</p>
+                <button type="button" class="btn-apple-primary btn-show-auth-modal margin-top-md" style="margin-left: auto; margin-right: auto;">
+                    <span data-i18n="btn-login-now">Hemen Giriş Yap / Üye Ol</span>
+                    <i class="fa-solid fa-arrow-right-long"></i>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- ====================================================
+         2. USER CABINET DASHBOARD VIEW (Authenticated Only)
+         ==================================================== -->
+    <div id="view-dashboard" class="view-wrapper hidden">
+        <!-- Dashboard Header -->
+        <header class="app-header">
+            <div class="header-container">
+                <div class="logo">
+                    <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+                    <span class="logo-text">Aura<span>Fit</span></span>
+                </div>
+                
+                <div class="welcome-user-bar" id="user-welcome-area">
+                    <span data-i18n="welcome-prefix">Merhaba,</span> 
+                    <span id="user-display-name">Misafir</span>! 🌟
+                </div>
+
+                <div class="header-controls">
+                    <button type="button" class="btn-circle btn-theme-toggle" title="Tema Değiştir">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <button type="button" class="btn-circle btn-lang-toggle" title="Language / Dil">
+                        TR
+                    </button>
+                    <div class="auth-buttons-group">
+                        <button type="button" class="btn-auth" id="btn-show-history">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <span data-i18n="btn-my-history">Kabin Geçmişim</span>
+                        </button>
+                        <button type="button" class="btn-auth btn-logout" id="btn-logout" title="Çıkış Yap">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Split Grid Panel Cabin -->
+        <main class="main-container">
+            <!-- Left Side Configuration panel -->
+            <section class="panel panel-inputs">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-sliders header-icon"></i> <span data-i18n="inputs-title">Giriş Yapılandırması</span></h2>
+                    <p data-i18n="inputs-subtitle">Kendi fotoğrafınızı ekleyin ve denemek istediğiniz ürünü seçin.</p>
+                </div>
+
+                <!-- STEP 1: USER IMAGE -->
+                <div class="input-group">
+                    <label class="group-label"><span class="step-num">1</span> <span data-i18n="step1-label">Fotoğrafınızı Seçin</span></label>
+                    <div class="template-selector">
+                        <span class="template-label" data-i18n="quick-models">Hızlı Şablon Mankenler:</span>
+                        <div class="template-grid" id="user-templates">
+                            <div class="template-card active" data-filename="model_man.jpg" data-gender="erkek">
+                                <img src="assets/model_man.jpg" alt="Manken Erkek">
+                                <span data-i18n="model-man">Erkek Manken</span>
+                            </div>
+                            <div class="template-card" data-filename="model_woman.jpg" data-gender="kadin">
+                                <img src="assets/model_woman.jpg" alt="Manken Kadın">
+                                <span data-i18n="model-woman">Kadın Manken</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Upload Area -->
+                    <div class="upload-area" id="user-upload-area">
+                        <input type="file" id="user-image-input" accept="image/*" class="file-input-hidden">
+                        <div class="upload-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                            <p class="upload-title" data-i18n="upload-user-title">Kendi Fotoğrafınızı Yükleyin</p>
+                            <p class="upload-desc" data-i18n="upload-user-desc">Sürükleyip bırakın veya göz atın (PNG, JPG)</p>
+                        </div>
+                        <div class="upload-preview hidden" id="user-upload-preview">
+                            <img src="" alt="Yüklenen Fotoğraf">
+                            <button type="button" class="btn-remove-preview" id="btn-remove-user-img">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: PRODUCT SELECTION -->
+                <div class="input-group">
+                    <label class="group-label"><span class="step-num">2</span> <span data-i18n="step2-label">Kıyafet Detayları</span></label>
+                    <div class="toggle-tabs">
+                        <button type="button" class="tab-btn active" id="tab-btn-link"><i class="fa-solid fa-link"></i> <span data-i18n="tab-link">Link ile Çözümle</span></button>
+                        <button type="button" class="tab-btn" id="tab-btn-file"><i class="fa-solid fa-file-import"></i> <span data-i18n="tab-file">Görsel Yükle</span></button>
+                    </div>
+
+                    <!-- Link Panel -->
+                    <div class="tab-content" id="panel-link">
+                        <div class="link-parser-container">
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-globe input-icon-left"></i>
+                                <input type="text" id="product-url" placeholder="Trendyol, H&M, Amazon vb. ürün linki yapıştırın..." class="premium-input" data-i18n-placeholder="placeholder-url">
+                            </div>
+                            <div class="price-link-grid">
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-turkish-lira-sign input-icon-left"></i>
+                                    <input type="number" id="product-url-price" placeholder="Fiyat (İsteğe Bağlı)" class="premium-input" data-i18n-placeholder="placeholder-price-opt">
+                                </div>
+                                <button type="button" class="btn-action" id="btn-parse-link">
+                                    <span class="btn-text" data-i18n="btn-parse">Çözümle & Getir</span>
+                                    <i class="fa-solid fa-wand-magic"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual File Upload Panel -->
+                    <div class="tab-content hidden" id="panel-file">
+                        <div class="upload-area" id="product-upload-area">
+                            <input type="file" id="product-image-input" accept="image/*" class="file-input-hidden">
+                            <div class="upload-placeholder">
+                                <i class="fa-solid fa-shirt upload-icon"></i>
+                                <p class="upload-title" data-i18n="upload-product-title">Kıyafet Görseli Yükleyin</p>
+                                <p class="upload-desc" data-i18n="upload-product-desc">Beyaz arka planlı kıyafet görselleri önerilir</p>
+                            </div>
+                            <div class="upload-preview hidden" id="product-upload-preview">
+                                <img src="" alt="Kıyafet Fotoğrafı">
+                                <button type="button" class="btn-remove-preview" id="btn-remove-product-img">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="manual-inputs-grid">
+                            <input type="text" id="product-title" placeholder="Kıyafet Başlığı (örn: Oversize Mavi Sweatshirt)" class="premium-input" data-i18n-placeholder="placeholder-title">
+                            <input type="number" id="product-price" placeholder="Fiyat (TL)" class="premium-input" data-i18n-placeholder="placeholder-price">
+                            <textarea id="product-desc" placeholder="Kumaş, kesim vb. detaylar (isteğe bağlı)" class="premium-input text-area" data-i18n-placeholder="placeholder-desc"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Predefined Garments Templates -->
+                    <div class="template-selector margin-top-md">
+                        <span class="template-label" data-i18n="quick-garments">Hızlı Deneme Kıyafetleri:</span>
+                        <div class="template-grid" id="product-templates">
+                            <div class="template-card active" data-filename="garment_blue_hoodie.jpg" data-title="Mavi Premium Oversize Hoodie" data-price="899.90" data-desc="Unisex %100 pamuklu, kalın, içi şardonlu mavi hoodie.">
+                                <img src="assets/garment_blue_hoodie.jpg" alt="Mavi Hoodie">
+                                <span data-i18n="garment-blue-hoodie">Mavi Hoodie</span>
+                            </div>
+                            <div class="template-card" data-filename="garment_red_sweater.jpg" data-title="Kırmızı Örgü Balıkçı Yaka Kazak" data-price="749.90" data-desc="Triko örgü, boğazlı yaka, yumuşak dokulu kırmızı kışlık kazak.">
+                                <img src="assets/garment_red_sweater.jpg" alt="Kırmızı Kazak">
+                                <span data-i18n="garment-red-sweater">Kırmızı Kazak</span>
+                            </div>
+                            <div class="template-card" data-filename="garment_green_dress.jpg" data-title="Zarif Yeşil Keten Yazlık Elbise" data-price="1499.90" data-desc="Askılı, hafif keten kumaş, nefes alabilen yeşil yazlık elbise.">
+                                <img src="assets/garment_green_dress.jpg" alt="Yeşil Elbise">
+                                <span data-i18n="garment-green-dress">Yeşil Elbise</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" class="btn-submit-tryon" id="btn-submit-tryon">
+                    <span data-i18n="btn-submit-tryon">SANAL KABİNİ BAŞLAT</span>
+                    <i class="fa-solid fa-sparkles btn-submit-glow"></i>
+                </button>
+            </section>
+
+            <!-- Right Side Output and Analytics Report panel -->
+            <section class="panel panel-results" id="panel-results">
+                <!-- 1. EMPTY CLOSETS STATE -->
+                <div class="result-state-view active" id="state-empty">
+                    <div class="empty-state-content">
+                        <div class="empty-animation-container">
+                            <div class="circle-pulse"></div>
+                            <i class="fa-solid fa-shirt empty-icon"></i>
+                        </div>
+                        <h3 data-i18n="empty-title">Sanal Kabin Hazır</h3>
+                        <p data-i18n="empty-desc">Manken seçimi yapın veya kendi fotoğrafınızı yükleyin. Ardından kıyafeti belirleyip "Sanal Kabini Başlat" butonuna tıklayarak sihirli yapay zeka deneyimini yaşayın.</p>
+                    </div>
+                </div>
+
+                <!-- 2. RENDERING PROGRESS STATE -->
+                <div class="result-state-view hidden" id="state-loading">
+                    <div class="loading-state-content">
+                        <div class="premium-loader">
+                            <div class="spinner-core"></div>
+                            <div class="spinner-ring glow-m"></div>
+                            <div class="spinner-ring delay-1"></div>
+                        </div>
+                        <h3 data-i18n="load-title">AuraFit Analiz Ediyor...</h3>
+                        <p class="loader-subtitle" data-i18n="load-subtitle">Yapay zeka modellerimiz verilerinizi işliyor.</p>
+                        
+                        <div class="progress-stepper">
+                            <div class="step-item active" id="loading-step-1">
+                                <div class="step-icon"><i class="fa-solid fa-brain"></i></div>
+                                <div class="step-details">
+                                    <h4 data-i18n="step1-t">Gemini Prompt Optimizasyonu</h4>
+                                    <p class="step-status" data-i18n="status-opt">Analiz ediliyor...</p>
+                                </div>
+                            </div>
+                            <div class="step-item" id="loading-step-2">
+                                <div class="step-icon"><i class="fa-solid fa-image"></i></div>
+                                <div class="step-details">
+                                    <h4 data-i18n="step2-t">Virtual Try-On Giydirme</h4>
+                                    <p class="step-status" data-i18n="status-wait">Sırada...</p>
+                                </div>
+                            </div>
+                            <div class="step-item" id="loading-step-3">
+                                <div class="step-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                <div class="step-details">
+                                    <h4 data-i18n="step3-t">Finansal ROI & Stil Analizi</h4>
+                                    <p class="step-status" data-i18n="status-wait">Sırada...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. DETAILED SUCCESS STATE (REPORTS + SLIDER) -->
+                <div class="result-state-view hidden" id="state-success">
+                    <div class="vton-visualizer-container">
+                        <div class="image-compare-wrapper" id="dashboard-compare-slider">
+                            <img src="" alt="Kullanıcı Orijinal" class="compare-img compare-before" id="img-compare-before">
+                            <div class="compare-after-wrapper" id="dashboard-after-wrapper">
+                                <img src="" alt="Giydirilmiş Hali" class="compare-img compare-after" id="img-compare-after">
+                            </div>
+                            <div class="compare-slider-bar" id="dashboard-slider-bar">
+                                <div class="slider-button"><i class="fa-solid fa-left-right"></i></div>
+                            </div>
+                            <span class="compare-label label-before" data-i18n="label-orig">Orijinal</span>
+                            <span class="compare-label label-after" data-i18n="label-tryon">AuraFit Kabin</span>
+                        </div>
+                    </div>
+
+                    <div class="reports-grid">
+                        <!-- Card A: Size Fit -->
+                        <div class="report-card card-glass fit-card">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <i class="fa-solid fa-ruler-combined card-icon color-blue"></i>
+                                    <div>
+                                        <h3 data-i18n="rep-fit-title-h">Kalıp & Beden Uyumu</h3>
+                                        <span class="badge-body-type" id="rep-body-type">Atletik</span>
+                                    </div>
+                                </div>
+                                <div class="fit-score-badge">
+                                    <span class="score-num" id="rep-fit-score">85</span>
+                                    <span class="score-label" data-i18n="rep-fit-score-lbl">Uyum Puanı</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h4 id="rep-fit-title" class="fit-verdict-title">Uyumlu Kesim</h4>
+                                <p id="rep-fit-desc" class="report-paragraph">Kıyafetin genel kesimi vücut yapınızla son derece uyumlu görünüyor. Kendi bedeninizi tercih edebilirsiniz.</p>
+                                <div class="color-harmony-box">
+                                    <h5><i class="fa-solid fa-palette"></i> <span data-i18n="rep-color-h">Renk Uyum Analizi</span></h5>
+                                    <p id="rep-color-harmony" class="report-paragraph-sm">Ürünün rengi ten tonunuzla oldukça iyi bir kontrast oluşturuyor ve enerjik bir duruş sergiliyor.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card B: Cost-per-Wear ROI -->
+                        <div class="report-card card-glass finance-card">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <i class="fa-solid fa-calculator-dollar card-icon color-green"></i>
+                                    <div>
+                                        <h3 data-i18n="rep-fin-title-h">Akıllı Finansal ROI Analizi</h3>
+                                        <p class="card-subtitle" data-i18n="rep-fin-sub">Giyim Başına Maliyet (Cost-per-Wear) Yatırım Getirisi</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="price-quality-badge-row">
+                                    <div class="pq-badge">
+                                        <span class="label" data-i18n="fin-price">Ürün Fiyatı</span>
+                                        <span class="value color-green" id="rep-price">0.00 TL</span>
+                                    </div>
+                                    <div class="pq-badge">
+                                        <span class="label" data-i18n="fin-quality">Kumaş Kalitesi</span>
+                                        <span class="value" id="rep-quality">⭐⭐⭐⭐</span>
+                                    </div>
+                                </div>
+
+                                <div class="cpw-calculator">
+                                    <h5><i class="fa-solid fa-chart-pie"></i> <span data-i18n="fin-sim-t">İnteraktif Giyim Simülasyonu</span></h5>
+                                    <p class="cpw-desc" data-i18n="fin-sim-desc">Bu kıyafeti yılda kaç kez giymeyi planlıyorsunuz? Sürükleyin ve maliyet değişimini görün!</p>
+                                    
+                                    <div class="cpw-slider-container">
+                                        <input type="range" min="1" max="100" value="30" class="cpw-slider-control" id="cpw-slider">
+                                        <div class="slider-ticks-labels">
+                                            <span data-i18n="slider-tick-1">1 Giyme</span>
+                                            <span data-i18n="slider-tick-30">30 Giyme</span>
+                                            <span data-i18n="slider-tick-100">100 Giyme</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="cpw-outputs-row">
+                                        <div class="cpw-output-block block-main">
+                                            <span class="label" data-i18n="out-cpw">Giyim Başına Maliyet (CPW)</span>
+                                            <span class="value" id="cpw-dynamic-val">0.00 TL</span>
+                                        </div>
+                                        <div class="cpw-output-block">
+                                            <span class="label" data-i18n="out-amort">Tahmini Amorti Süresi</span>
+                                            <span class="value" id="cpw-amortization">Hızlı ROI</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="roi-summary-box">
+                                    <i class="fa-solid fa-circle-check roi-check-icon"></i>
+                                    <p id="rep-roi-verdict" class="report-paragraph-sm">Bu kıyafet, gardırobunuzdaki temel parçalarla rahatça eşleşerek kendini hızla amorti ediyor.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card C: Stylist Matches -->
+                        <div class="report-card card-glass stylist-card">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <i class="fa-solid fa-user-tie card-icon color-purple"></i>
+                                    <div>
+                                        <h3 data-i18n="rep-sty-t">Akıllı Stilist Kombin Önerisi</h3>
+                                        <p class="card-subtitle" data-i18n="rep-sty-sub">Gemini AI tarafından tasarlanmış tamamlayıcı parçalar</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="stylist-suggestions-list" id="rep-stylist-list">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions-row">
+                        <button type="button" class="btn-secondary" id="btn-reset-tryon">
+                            <i class="fa-solid fa-rotate-left"></i> <span data-i18n="btn-new-try">Yeni Kabin Deneyimi Başlat</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ====================================================
+         3. AUTHENTICATION MODAL (REGISTER / LOGIN POPUP)
+         ==================================================== -->
+    <div class="modal-overlay hidden" id="auth-modal">
+        <div class="modal-card">
+            <button type="button" class="modal-close-btn" id="btn-close-auth"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="modal-tabs">
+                <button type="button" class="modal-tab-btn active" id="modal-tab-login" data-i18n="m-login">Giriş Yap</button>
+                <button type="button" class="modal-tab-btn" id="modal-tab-register" data-i18n="m-register">Kayıt Ol</button>
+            </div>
+            
+            <!-- Login -->
+            <div class="modal-view" id="modal-view-login">
+                <h3 data-i18n="login-t">AuraFit'e Giriş Yapın</h3>
+                <p class="modal-sub" data-i18n="login-sub">Yapay zeka asistanınıza erişmek için bilgilerinizi girin.</p>
+                <form id="form-login" class="modal-form">
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user input-icon-left"></i>
+                        <input type="text" id="login-username" required placeholder="Kullanıcı Adı" class="premium-input" data-i18n-placeholder="m-p-user">
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key input-icon-left"></i>
+                        <input type="password" id="login-password" required placeholder="Şifre" class="premium-input" data-i18n-placeholder="m-p-pass">
+                    </div>
+                    <button type="submit" class="btn-submit-tryon margin-top-sm">
+                        <span data-i18n="btn-login-action">GİRİŞ YAP</span>
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Register -->
+            <div class="modal-view hidden" id="modal-view-register">
+                <h3 data-i18n="reg-t">Hesap Oluşturun</h3>
+                <p class="modal-sub" data-i18n="reg-sub">Akıllı kabin ve bütçe ROI analizlerini kullanmaya başlayın.</p>
+                <form id="form-register" class="modal-form">
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user input-icon-left"></i>
+                        <input type="text" id="register-username" required placeholder="Kullanıcı Adı" class="premium-input" data-i18n-placeholder="m-p-user">
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope input-icon-left"></i>
+                        <input type="email" id="register-email" required placeholder="E-Posta Adresi" class="premium-input" data-i18n-placeholder="m-p-email">
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-id-card input-icon-left"></i>
+                        <input type="text" id="register-fullname" required placeholder="Adınız Soyadınız" class="premium-input" data-i18n-placeholder="m-p-fullname">
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key input-icon-left"></i>
+                        <input type="password" id="register-password" required placeholder="Şifre" class="premium-input" data-i18n-placeholder="m-p-pass">
+                    </div>
+                    <button type="submit" class="btn-submit-tryon margin-top-sm">
+                        <span data-i18n="btn-register-action">KAYIT OL VE GİRİŞ YAP</span>
+                        <i class="fa-solid fa-user-plus"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================
+         4. HISTORY ARCHIVE MODAL (Neon PG Database Records)
+         ==================================================== -->
+    <div class="modal-overlay hidden" id="history-modal">
+        <div class="modal-card modal-card-large">
+            <button type="button" class="modal-close-btn" id="btn-close-history"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="modal-header-large"><i class="fa-solid fa-history"></i> <span data-i18n="hist-header">Kişisel Sanal Kabin Arşiviniz</span></h2>
+            <p class="modal-subtitle-large" data-i18n="hist-sub">PostgreSQL Neon DB'de güvenle saklanan önceki denemeleriniz.</p>
+            
+            <div class="history-grid-container" id="history-items-grid">
+                <!-- Dynamic -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Apple Styled Footer -->
+    <footer class="app-footer">
+        <p>© 2026 AuraFit - AI-Powered Virtual Try-On & E-Commerce FinTech. All rights reserved.</p>
+    </footer>
+
+    <!-- Custom App Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>
