@@ -563,7 +563,13 @@
     <div class="modal-overlay hidden" id="history-modal">
         <div class="modal-card modal-card-large">
             <button type="button" class="modal-close-btn" id="btn-close-history"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="modal-header-large"><i class="fa-solid fa-history"></i> <span data-i18n="hist-header">Kişisel Sanal Kabin Arşiviniz</span></h2>
+            <div class="modal-header-row">
+                <h2 class="modal-header-large"><i class="fa-solid fa-history"></i> <span data-i18n="hist-header">Kişisel Sanal Kabin Arşiviniz</span></h2>
+                <button type="button" class="btn-clear-history apple-btn-danger" id="btn-clear-history" style="display: none;">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span data-i18n="btn-clear-all">Tümünü Temizle</span>
+                </button>
+            </div>
             <p class="modal-subtitle-large" data-i18n="hist-sub">PostgreSQL Neon DB'de güvenle saklanan önceki denemeleriniz.</p>
             
             <div class="history-grid-container" id="history-items-grid">

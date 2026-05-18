@@ -130,6 +130,7 @@ const translations = {
         "chat_error": "Bağlantı kurulurken bir sorun oluştu. Lütfen tekrar deneyin.",
         "btn-developer-contact": "Geliştirici İletişim",
         "chat_bubble_hello": "Merhaba, ben asistanın Terzican! Sana yardımcı olabilirim. 🧵",
+        "btn-clear-all": "Tümünü Temizle",
         "footer-text": "© 2026 AuraFit. Yapay zeka destekli yeni nesil sanal kabin ve akıllı e-ticaret platformu. Tüm hakları saklıdır."
     },
     en: {
@@ -242,6 +243,7 @@ const translations = {
         "chat_error": "Connection issues occurred. Please try again.",
         "btn-developer-contact": "Contact Developer",
         "chat_bubble_hello": "Hello, I'm Terzican, your digital tailor! How can I help you? 🧵",
+        "btn-clear-all": "Clear All",
         "footer-text": "© 2026 AuraFit. Next-generation generative AI fashion cabin & e-commerce styling platform. All rights reserved."
     }
 };
@@ -947,6 +949,15 @@ historyModal.addEventListener("click", (e) => {
 
 function renderHistoryGrid(history) {
     historyItemsGrid.innerHTML = "";
+    const btnClearHistory = document.getElementById("btn-clear-history");
+    
+    if (btnClearHistory) {
+        if (history.length === 0) {
+            btnClearHistory.style.display = "none";
+        } else {
+            btnClearHistory.style.display = "flex";
+        }
+    }
     
     if (history.length === 0) {
         historyItemsGrid.innerHTML = `
@@ -977,9 +988,15 @@ function renderHistoryGrid(history) {
                 <span class="price">${item.price.toLocaleString(activeLang === 'tr' ? 'tr-TR' : 'en-US')} TL</span>
                 <span class="date"><i class="fa-solid fa-calendar-alt"></i> ${formattedDate}</span>
             </div>
+            <button type="button" class="btn-delete-card-item" title="${activeLang === 'tr' ? 'Sil' : 'Delete'}">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
         `;
         
-        card.addEventListener("click", () => {
+        card.addEventListener("click", (e) => {
+            // Only trigger restore if they didn't click the delete button
+            if (e.target.closest(".btn-delete-card-item")) return;
+            
             historyModal.classList.add("hidden");
             
             imgCompareBefore.src = `${API_BASE}${item.user_image_url}`;
@@ -995,7 +1012,55 @@ function renderHistoryGrid(history) {
             initCompareSlider("dashboard-compare-slider", "dashboard-after-wrapper", "dashboard-slider-bar");
         });
         
+        // Bind individual delete button
+        const btnDelete = card.querySelector(".btn-delete-card-item");
+        btnDelete.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            if (!confirm(activeLang === "tr" ? "Bu denemeyi arşivinizden silmek istediğinize emin misiniz?" : "Are you sure you want to delete this trial?")) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/history/${item.id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    card.style.transition = "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)";
+                    card.style.opacity = "0";
+                    card.style.transform = "scale(0.9) translateY(10px)";
+                    setTimeout(() => {
+                        const updatedHistory = history.filter(h => h.id !== item.id);
+                        renderHistoryGrid(updatedHistory);
+                    }, 350);
+                }
+            } catch (err) {
+                console.error("Delete individual card failed:", err);
+            }
+        });
+        
         historyItemsGrid.appendChild(card);
+    });
+}
+
+// Bind bulk clear all button once
+const btnClearHistory = document.getElementById("btn-clear-history");
+if (btnClearHistory) {
+    btnClearHistory.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if (!confirm(activeLang === "tr" ? "Tüm sanal kabin geçmişinizi kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz." : "Are you sure you want to permanently clear all cabinet history? This action cannot be undone.")) return;
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/history`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                renderHistoryGrid([]);
+            }
+        } catch (err) {
+            console.error("Clear all failed:", err);
+        }
     });
 }
 

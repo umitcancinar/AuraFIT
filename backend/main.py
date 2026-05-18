@@ -108,13 +108,28 @@ async def serve_uploads(file_path: str):
     if os.path.exists(local_path):
         return FileResponse(local_path)
         
-    # 2. Try backend assets directory (for fallback templates)
     filename = os.path.basename(file_path)
+
+    # 2. Check for quick templates in filename to handle Vercel's ephemeral /tmp storage
+    if "model_man" in filename:
+        return FileResponse(os.path.join(ASSETS_DIR, "model_man.jpg"))
+    if "model_woman" in filename:
+        return FileResponse(os.path.join(ASSETS_DIR, "model_woman.jpg"))
+    if "garment_blue_hoodie" in filename:
+        return FileResponse(os.path.join(ASSETS_DIR, "garment_blue_hoodie.jpg"))
+    if "garment_red_sweater" in filename:
+        return FileResponse(os.path.join(ASSETS_DIR, "garment_red_sweater.jpg"))
+    if "garment_green_dress" in filename:
+        return FileResponse(os.path.join(ASSETS_DIR, "garment_green_dress.jpg"))
+    if "garment_blue_jacket" in filename:
+        return FileResponse(os.path.join(ASSETS_DIR, "garment_blue_jacket.jpg"))
+        
+    # 3. Try backend assets directory (for fallback templates)
     asset_path = os.path.join(ASSETS_DIR, filename)
     if os.path.exists(asset_path):
         return FileResponse(asset_path)
         
-    # 3. Try standard assets directory
+    # 4. Try standard assets directory
     fallback_asset_path = os.path.join(BASE_DIR, "assets", filename)
     if os.path.exists(fallback_asset_path):
         return FileResponse(fallback_asset_path)
@@ -329,6 +344,28 @@ def get_history(current_user: User = Depends(get_current_user), db: Session = De
             } for r in history
         ]
     }
+
+@app.delete("/api/history/{record_id}")
+def delete_record(record_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Geçersiz veya eksik oturum bilgisi.")
+        
+    record = db.query(TryOn).filter(TryOn.id == record_id, TryOn.user_id == current_user.id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Kayıt bulunamadı.")
+        
+    db.delete(record)
+    db.commit()
+    return {"status": "success", "message": "Kayıt başarıyla silindi."}
+
+@app.delete("/api/history")
+def delete_all_history(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Geçersiz veya eksik oturum bilgisi.")
+        
+    db.query(TryOn).filter(TryOn.user_id == current_user.id).delete()
+    db.commit()
+    return {"status": "success", "message": "Tüm geçmiş başarıyla silindi."}
 
 @app.post("/api/try-on")
 async def try_on(
