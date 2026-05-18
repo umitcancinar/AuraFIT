@@ -23,14 +23,26 @@ else:
     elif DATABASE_URL.startswith("postgresql://"):
         DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
         
-    if "postgresql" in DATABASE_URL and "sslmode" not in DATABASE_URL:
-        if "?" in DATABASE_URL:
-            DATABASE_URL += "&sslmode=require"
-        else:
-            DATABASE_URL += "?sslmode=require"
+    # Strip sslmode from the URL to prevent pg8000 from throwing 'unexpected keyword argument sslmode'
+    if "sslmode" in DATABASE_URL:
+        import urllib.parse as urlparse
+        parsed = urlparse.urlparse(DATABASE_URL)
+        qd = urlparse.parse_qs(parsed.query)
+        qd.pop("sslmode", None)
+        new_query = urlparse.urlencode(qd, doseq=True)
+        DATABASE_URL = urlparse.urlunparse(
+            (parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment)
+        )
 
 def get_engine_and_session(url):
-    c_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
+    c_args = {}
+    if url.startswith("sqlite"):
+        c_args["check_same_thread"] = False
+    elif "postgresql" in url:
+        import ssl
+        # Standard default SSL context for Neon/Supabase SSL connections
+        c_args["ssl_context"] = ssl.create_default_context()
+        
     eng = create_engine(url, connect_args=c_args)
     sess = sessionmaker(autocommit=False, autoflush=False, bind=eng)
     return eng, sess
