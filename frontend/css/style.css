@@ -1159,7 +1159,7 @@ body.light-theme .btn-action {
     justify-content: center;
 }
 
-#state-success {
+#state-success:not(.hidden) {
     height: auto !important;
     display: flex !important;
     flex-direction: column !important;
