@@ -2296,46 +2296,252 @@ body.light-theme .history-card:hover {
     box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.2) !important;
     background: rgba(0, 0, 0, 0.3) !important;
 }
-[data-theme="light"] .apple-textarea:focus {
-    background: #ffffff !important;
+/* ====================================================
+   APPLE CHIC DASHBOARD OVERRIDES (ULTRA PREMIUM)
+   ==================================================== */
+
+/* Background Atmosphere */
+#view-dashboard {
+    background: radial-gradient(circle at top right, rgba(108, 92, 231, 0.05), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(0, 122, 255, 0.05), transparent 40%);
 }
 
+/* Glass Panels */
+.apple-glass, .panel-results {
+    background: rgba(28, 28, 30, 0.6) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+[data-theme="light"] .apple-glass, [data-theme="light"] .panel-results {
+    background: rgba(255, 255, 255, 0.7) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Panel Headers */
+.panel-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+[data-theme="light"] .panel-header h2 {
+    background: linear-gradient(135deg, #000 0%, #606060 100%);
+    -webkit-background-clip: text;
+}
+.panel-header p {
+    font-size: 0.95rem;
+    opacity: 0.7;
+    margin-bottom: 2rem;
+}
+
+/* Step Numbers & Labels */
+.group-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+.step-num {
+    background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    color: white;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+
+/* Upload Areas */
+.upload-area {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+[data-theme="light"] .upload-area {
+    background: rgba(0, 0, 0, 0.02);
+    border: 2px dashed rgba(0, 0, 0, 0.1);
+}
+.upload-area:hover {
+    border-color: #6c5ce7;
+    background: rgba(108, 92, 231, 0.05);
+    transform: translateY(-2px);
+}
+.upload-icon {
+    font-size: 2.5rem;
+    color: #a29bfe;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+.upload-area:hover .upload-icon {
+    transform: scale(1.1) translateY(-5px);
+}
+.upload-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.25rem;
+}
+.upload-desc {
+    font-size: 0.85rem;
+    opacity: 0.6;
+}
+
+/* Template Cards */
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+.template-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+[data-theme="light"] .template-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.template-card img {
+    border-radius: 10px;
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.template-card span {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+    opacity: 0.8;
+}
+.template-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+.template-card:hover img {
+    transform: scale(1.05);
+}
+.template-card.active {
+    border: 2px solid #6c5ce7;
+    background: rgba(108, 92, 231, 0.1);
+}
+
+/* Text Areas & Inputs */
+.premium-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 14px !important;
+    color: var(--text-color);
+    padding: 14px 18px !important;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+[data-theme="light"] .premium-input {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+.premium-input:focus {
+    border-color: #6c5ce7 !important;
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.2) !important;
+    outline: none;
+}
+.apple-textarea {
+    min-height: 100px !important;
+    resize: vertical;
+}
+
+/* Primary Button Animation */
 .apple-btn-primary {
+    width: 100%;
     background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 999px !important;
     color: #fff !important;
-    font-weight: 600 !important;
-    padding: 18px 32px !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem;
+    padding: 20px 32px !important;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    letter-spacing: 1.5px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.apple-btn-primary i {
+    font-size: 1.2rem;
+    color: #a29bfe;
+    animation: sparkle-pulse 2s infinite ease-in-out;
+}
+
+@keyframes sparkle-pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 1; text-shadow: 0 0 10px #a29bfe; }
+    100% { transform: scale(1); opacity: 0.8; }
 }
 
 .apple-btn-primary:hover {
-    transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
     background: linear-gradient(135deg, #000000 0%, #2c2c2c 100%) !important;
+}
+.apple-btn-primary:active {
+    transform: translateY(1px) scale(0.98) !important;
 }
 
 [data-theme="light"] .apple-btn-primary {
-    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%) !important;
-    color: #1d1d1f !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+    background: linear-gradient(135deg, #000000 0%, #333333 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
 }
 [data-theme="light"] .apple-btn-primary:hover {
-    background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%) !important;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
 }
 
 .notes-container .helper-text {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-color-light);
-    margin-top: 8px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    opacity: 0.8;
+    gap: 8px;
+    opacity: 0.7;
 }
+
