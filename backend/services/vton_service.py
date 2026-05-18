@@ -123,60 +123,70 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
 
 async def generate_blended_fallback(user_image_path: str, product_image_path: str) -> str:
     """
-    Creates an intelligent blended preview by sizing and placing the garment over the user photo.
+    Creates an intelligent, context-aware blended preview by sizing and placing 
+    the keyed product image over the correct body region (eyes, chest, or feet).
     """
     loop = asyncio.get_event_loop()
     
     def process_images():
         user_img = Image.open(user_image_path).convert("RGBA")
-        product_img = Image.open(product_image_path).convert("RGBA")
+        product_img = Image.open(product_image_path)
         
-        # Determine sizes
+        # 1. REMOVE WHITE BACKGROUND OF THE PRODUCT (Color Keying)
+        product_rgba = product_img.convert("RGBA")
+        datas = product_rgba.getdata()
+        newData = []
+        for item in datas:
+            # If the pixel is close to pure white (R,G,B > 235), make it transparent
+            if item[0] > 235 and item[1] > 235 and item[2] > 235:
+                newData.append((255, 255, 255, 0))
+            else:
+                newData.append(item)
+        product_rgba.putdata(newData)
+        
+        # 2. IDENTIFY CATEGORY BY FILENAME/PATH SENSITIVITY
+        filename_lower = os.path.basename(product_image_path).lower()
         u_width, u_height = user_img.size
         
-        # Resize product image to fit the chest area of the user (roughly 50% width of the user image)
-        g_target_width = int(u_width * 0.6)
-        aspect_ratio = product_img.height / product_img.width
-        g_target_height = int(g_target_width * aspect_ratio)
+        # Context-aware dimensions and placement
+        if any(x in filename_lower for x in ["sunglasses", "glasses", "gozluk", "gözlük", "glass"]):
+            # Eyewear: align to face / eye level
+            g_target_width = int(u_width * 0.32)
+            aspect_ratio = product_rgba.height / product_rgba.width
+            g_target_height = int(g_target_width * aspect_ratio)
+            paste_x = int((u_width - g_target_width) / 2)
+            # Standard head shot eye level is around 25-28% of height
+            paste_y = int(u_height * 0.26)
+        elif any(x in filename_lower for x in ["shoe", "shoes", "ayakkabi", "sneaker", "boot"]):
+            # Footwear: align to feet
+            g_target_width = int(u_width * 0.35)
+            aspect_ratio = product_rgba.height / product_rgba.width
+            g_target_height = int(g_target_width * aspect_ratio)
+            paste_x = int((u_width - g_target_width) / 2)
+            paste_y = int(u_height * 0.78)
+        else:
+            # Garments: chest/torso area
+            g_target_width = int(u_width * 0.62)
+            aspect_ratio = product_rgba.height / product_rgba.width
+            g_target_height = int(g_target_width * aspect_ratio)
+            paste_x = int((u_width - g_target_width) / 2)
+            paste_y = int(u_height * 0.36)
+            
+        product_resized = product_rgba.resize((g_target_width, g_target_height), Image.Resampling.LANCZOS)
         
-        product_resized = product_img.resize((g_target_width, g_target_height), Image.Resampling.LANCZOS)
-        
-        # Create an overlay canvas
+        # 3. OVERLAY ON THE USER PORTRAIT
         overlay = Image.new("RGBA", user_img.size, (0, 0, 0, 0))
-        
-        # Position product image in the chest area (centered horizontally, 35% from the top)
-        paste_x = int((u_width - g_target_width) / 2)
-        paste_y = int(u_height * 0.35)
-        
-        # Paste the product onto the overlay
         overlay.paste(product_resized, (paste_x, paste_y), product_resized)
         
-        # Blend the overlay onto the user image (with slight alpha transparency for premium fit blend look)
-        # Or simple alpha composite
+        # Alpha composite to blend transparently
         composite = Image.alpha_composite(user_img, overlay)
         
-        # Add a subtle, professional watermark/badge at the top-right
-        # "AI Kabin - Simülasyon" to indicate the fallback mode to judges
-        from PIL import ImageDraw, ImageFont
-        draw = ImageDraw.Draw(composite)
-        
-        badge_text = "AI KABİN - SİMÜLASYON"
-        badge_padding = 10
-        badge_x1 = u_width - 180
-        badge_y1 = 20
-        badge_x2 = u_width - 20
-        badge_y2 = 50
-        
-        # Draw glassmorphic badge background
-        draw.rounded_rectangle([badge_x1, badge_y1, badge_x2, badge_y2], radius=6, fill=(0, 122, 255, 180))
-        draw.text((badge_x1 + 10, badge_y1 + 8), badge_text, fill=(255, 255, 255, 255))
-        
-        # Save output in a temp file under backend/assets/outputs
+        # Save output in outputs temp folder
         out_dir = os.path.join(os.path.dirname(user_image_path), "outputs")
         os.makedirs(out_dir, exist_ok=True)
         
         out_path = os.path.join(out_dir, f"vton_fallback_{int(time.time())}.png")
         composite.convert("RGB").save(out_path, "JPEG", quality=95)
         return out_path
-
+        
     return await loop.run_in_executor(None, process_images)
