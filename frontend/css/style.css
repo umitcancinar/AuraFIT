@@ -1159,6 +1159,13 @@ body.light-theme .btn-action {
     justify-content: center;
 }
 
+#state-success {
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+}
+
 /* Empty State Styling */
 .empty-state-content {
     text-align: center;
@@ -1374,6 +1381,7 @@ body.light-theme .step-item {
 .vton-visualizer-container {
     width: 100%;
     margin-bottom: 2rem;
+    flex-shrink: 0 !important;
 }
 
 .image-compare-wrapper {
@@ -1384,6 +1392,7 @@ body.light-theme .step-item {
     overflow: hidden;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
     border: var(--glass-border);
+    flex-shrink: 0 !important;
 }
 
 .compare-img {
