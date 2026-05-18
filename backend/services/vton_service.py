@@ -31,6 +31,10 @@ TEMPLATE_MAPPING = {
     ("model_woman.jpg", "garment_green_dress.jpg"): "result_woman_green_dress.jpg",
 }
 
+import requests
+
+CUSTOM_VTON_API_URL = os.getenv("CUSTOM_VTON_API_URL", "").strip()
+
 async def run_vton(user_image_path: str, product_image_path: str, prompt: str, user_filename: str = None, product_filename: str = None) -> str:
     """
     Asynchronously runs the Virtual Try-On.
@@ -65,6 +69,40 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
                 # Wait 1.5 seconds to simulate AI thinking for authentic feel
                 await asyncio.sleep(1.5)
                 return os.path.abspath(p)
+
+    # 1.5 DEDICATED CUSTOM COLAB GPU API CALLER
+    if CUSTOM_VTON_API_URL:
+        try:
+            logger.info(f"Connecting to custom dedicated GPU VTON server: {CUSTOM_VTON_API_URL}")
+            # Run requests in executor to keep FastAPI asynchronous and non-blocking
+            loop = asyncio.get_event_loop()
+            
+            def call_custom_api():
+                with open(user_image_path, "rb") as u_f, open(product_image_path, "rb") as p_f:
+                    files = {
+                        "user_image": (os.path.basename(user_image_path), u_f, "image/jpeg"),
+                        "product_image": (os.path.basename(product_image_path), p_f, "image/jpeg")
+                    }
+                    data = {
+                        "prompt": prompt
+                    }
+                    res = requests.post(f"{CUSTOM_VTON_API_URL}/tryon", files=files, data=data, timeout=30)
+                    if res.ok:
+                        out_dir = os.path.join(os.path.dirname(user_image_path), "outputs")
+                        os.makedirs(out_dir, exist_ok=True)
+                        out_path = os.path.join(out_dir, f"vton_custom_{int(time.time())}.png")
+                        with open(out_path, "wb") as out_f:
+                            out_f.write(res.content)
+                        return out_path
+                    else:
+                        raise Exception(f"Custom server returned status {res.status_code}: {res.text}")
+            
+            result_path = await loop.run_in_executor(None, call_custom_api)
+            if result_path and os.path.exists(result_path):
+                logger.info(f"Dedicated Custom VTON API completed successfully. Result path: {result_path}")
+                return result_path
+        except Exception as custom_err:
+            logger.error(f"Dedicated Custom VTON API failed ({str(custom_err)}). Trying public/local fallbacks...")
                 
     # 2. LIVE HUGGING FACE API CALL
     try:
