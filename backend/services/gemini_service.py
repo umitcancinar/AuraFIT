@@ -1,9 +1,17 @@
 import os
 import json
 import logging
-import google.generativeai as genai
-from PIL import Image
 import io
+
+# Safe imports — these may fail on Vercel serverless due to binary deps
+try:
+    import google.generativeai as genai
+    from PIL import Image
+    _GEMINI_AVAILABLE = True
+except ImportError as _e:
+    _GEMINI_AVAILABLE = False
+    genai = None
+    Image = None
 
 # Setup logger
 logging.basicConfig(level=logging.INFO)
@@ -11,9 +19,11 @@ logger = logging.getLogger(__name__)
 
 # Initialize Gemini API
 api_key = os.getenv("GEMINI_API_KEY")
-if api_key:
+if _GEMINI_AVAILABLE and api_key:
     genai.configure(api_key=api_key)
     logger.info("Gemini API configured successfully.")
+elif not _GEMINI_AVAILABLE:
+    logger.warning("Gemini SDK not available (import failed). Fallback mode active.")
 else:
     logger.warning("GEMINI_API_KEY not found in environment variables!")
 

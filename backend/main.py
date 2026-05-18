@@ -58,9 +58,28 @@ except Exception as e:
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR, check_dir=False), name="uploads")
 app.mount("/assets", StaticFiles(directory=ASSETS_DIR, check_dir=False), name="assets")
 
-# Import Services
-from services.gemini_service import optimize_vton_prompt, generate_styling_and_roi_report, get_chatbot_reply
-from services.vton_service import run_vton
+# Import Services — wrapped in try/except to guarantee module ALWAYS loads on Vercel
+# If any heavy dependency (PIL, gradio_client, google.generativeai) fails,
+# the app still serves auth/chat endpoints with graceful fallbacks.
+
+try:
+    from services.gemini_service import optimize_vton_prompt, generate_styling_and_roi_report, get_chatbot_reply
+    logger.info("✅ gemini_service imported successfully")
+except Exception as _import_err:
+    logger.error(f"⚠️ gemini_service import failed: {_import_err}")
+    async def optimize_vton_prompt(product_title, product_desc=""): return f"A fashion garment: {product_title}"
+    async def generate_styling_and_roi_report(user_image_bytes, product_image_bytes, price):
+        return {"body_type": "Standart", "fit_analysis": {"score": 85, "title": "Uyumlu", "description": "Analiz servisi geçici olarak kullanılamıyor."}, "styling_suggestions": [], "color_harmony": "N/A", "financial_roi": {"price": price, "quality_rating": "N/A", "estimated_lifespan_wears": 50, "cost_per_wear_10": round(price/10,2), "cost_per_wear_30": round(price/30,2), "cost_per_wear_50": round(price/50,2), "roi_verdict": "Analiz servisi geçici olarak kullanılamıyor."}}
+    async def get_chatbot_reply(user_message, lang="tr"):
+        return "Merhaba! Şu anda yapay zeka servisine bağlanılamıyor. Lütfen biraz sonra tekrar deneyin." if lang == "tr" else "Hello! AI service is temporarily unavailable. Please try again shortly."
+
+try:
+    from services.vton_service import run_vton
+    logger.info("✅ vton_service imported successfully")
+except Exception as _import_err:
+    logger.error(f"⚠️ vton_service import failed: {_import_err}")
+    async def run_vton(*args, **kwargs): raise Exception("VTON servisi şu anda kullanılamıyor.")
+
 from services.db_service import (
     get_db, init_db, hash_password, verify_password, 
     create_access_token, decode_access_token, User, TryOn
@@ -201,8 +220,10 @@ def register(req: UserRegister, db: Session = Depends(get_db)):
 
 @app.post("/api/login")
 def login(req: UserLogin, db: Session = Depends(get_db)):
-    # Query user
-    user = db.query(User).filter(User.username == req.username).first()
+    # Query user by username OR email (users may enter either)
+    user = db.query(User).filter(
+        (User.username == req.username) | (User.email == req.username)
+    ).first()
     if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=400, detail="Hatalı kullanıcı adı veya şifre.")
     

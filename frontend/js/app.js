@@ -518,8 +518,14 @@ formLogin.addEventListener("submit", async (e) => {
             body: JSON.stringify({ username: u, password: p })
         });
         if (!res.ok) {
-            const errData = await res.json();
-            throw new Error(errData.detail || "Giriş başarısız.");
+            let errorMsg = "Giriş başarısız.";
+            try {
+                const errData = await res.json();
+                errorMsg = errData.detail || errorMsg;
+            } catch (_) {
+                errorMsg = `Sunucu hatası (${res.status}). Lütfen tekrar deneyin.`;
+            }
+            throw new Error(errorMsg);
         }
         
         const data = await res.json();
@@ -550,8 +556,14 @@ formRegister.addEventListener("submit", async (e) => {
             body: JSON.stringify({ username: u, email: em, full_name: fn, password: p })
         });
         if (!res.ok) {
-            const errData = await res.json();
-            throw new Error(errData.detail || "Kayıt başarısız.");
+            let errorMsg = "Kayıt başarısız.";
+            try {
+                const errData = await res.json();
+                errorMsg = errData.detail || errorMsg;
+            } catch (_) {
+                errorMsg = `Sunucu hatası (${res.status}). Lütfen tekrar deneyin.`;
+            }
+            throw new Error(errorMsg);
         }
         
         const data = await res.json();

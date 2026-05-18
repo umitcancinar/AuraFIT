@@ -1,10 +1,25 @@
 import os
 import logging
 import asyncio
-from PIL import Image, ImageOps
 import io
 import time
-from gradio_client import Client, handle_file
+
+# Safe imports — these may fail on Vercel serverless
+try:
+    from PIL import Image, ImageOps
+    _PIL_AVAILABLE = True
+except ImportError:
+    _PIL_AVAILABLE = False
+    Image = None
+    ImageOps = None
+
+try:
+    from gradio_client import Client, handle_file
+    _GRADIO_AVAILABLE = True
+except ImportError:
+    _GRADIO_AVAILABLE = False
+    Client = None
+    handle_file = None
 
 logger = logging.getLogger(__name__)
 
