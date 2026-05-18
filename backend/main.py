@@ -64,7 +64,6 @@ except Exception as e:
 # Mount Static Files (only needed for local dev — Vercel serves frontend via @vercel/static)
 if not os.environ.get("VERCEL"):
     try:
-        app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR, check_dir=False), name="uploads")
         app.mount("/assets", StaticFiles(directory=ASSETS_DIR, check_dir=False), name="assets")
     except Exception as _mount_err:
         print(f"StaticFiles mount warning: {_mount_err}")
@@ -96,7 +95,31 @@ from services.db_service import (
     create_access_token, decode_access_token, User, TryOn
 )
 
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+
+@app.get("/uploads/{file_path:path}")
+async def serve_uploads(file_path: str):
+    """
+    Custom endpoint to serve uploads and pre-rendered assets.
+    This guarantees 100% reliability on Vercel where StaticFiles mounting is restricted.
+    """
+    # 1. Try local/temp uploads directory
+    local_path = os.path.join(UPLOADS_DIR, file_path)
+    if os.path.exists(local_path):
+        return FileResponse(local_path)
+        
+    # 2. Try backend assets directory (for fallback templates)
+    filename = os.path.basename(file_path)
+    asset_path = os.path.join(ASSETS_DIR, filename)
+    if os.path.exists(asset_path):
+        return FileResponse(asset_path)
+        
+    # 3. Try standard assets directory
+    fallback_asset_path = os.path.join(BASE_DIR, "assets", filename)
+    if os.path.exists(fallback_asset_path):
+        return FileResponse(fallback_asset_path)
+        
+    raise HTTPException(status_code=404, detail="File not found")
 
 # Global Exception Handler to ensure 100% JSON error responses (prevents HTML crash pages on Vercel)
 @app.exception_handler(Exception)
