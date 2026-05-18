@@ -1034,7 +1034,7 @@ body.light-theme .premium-input:focus {
 }
 
 .input-wrapper .premium-input {
-    padding-left: 2.6rem;
+    padding-left: 3.2rem !important;
 }
 
 .input-icon-left {

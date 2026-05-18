@@ -268,14 +268,14 @@ def get_me(current_user: User = Depends(get_current_user)):
 def debug_db(db: Session = Depends(get_db)):
     """Returns the type of database connected (for debugging only)."""
     try:
-        from services.db_service import DATABASE_URL
-        # Don't return the full URL for security, just the dialect
-        dialect = DATABASE_URL.split("://")[0]
+        from services.db_service import DATABASE_URL, engine, use_sqlite_fallback
         # Count users to see if data exists
         user_count = db.query(User).count()
         return {
             "status": "success", 
-            "database_type": dialect, 
+            "configured_url_dialect": DATABASE_URL.split("://")[0],
+            "actual_driver": engine.url.drivername,
+            "is_sqlite_fallback": engine.url.drivername.startswith("sqlite"),
             "user_count": user_count,
             "message": "Connected successfully to the database."
         }
