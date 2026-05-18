@@ -612,6 +612,15 @@ productTemplates.forEach(card => {
 /* ----------------------------------------------------
    5. CUSTOM UPLOAD PREVIEWS
    ---------------------------------------------------- */
+// Stop click propagation on hidden file inputs to prevent double-triggering native file dialogs
+userImageInput.addEventListener("click", (e) => {
+    e.stopPropagation();
+});
+
+productImageInput.addEventListener("click", (e) => {
+    e.stopPropagation();
+});
+
 userUploadArea.addEventListener("click", (e) => {
     if (e.target !== btnRemoveUserImg && !btnRemoveUserImg.contains(e.target)) {
         userImageInput.click();
@@ -621,6 +630,55 @@ userUploadArea.addEventListener("click", (e) => {
 productUploadArea.addEventListener("click", (e) => {
     if (e.target !== btnRemoveProductImg && !btnRemoveProductImg.contains(e.target)) {
         productImageInput.click();
+    }
+});
+
+// HTML5 Drag and Drop Support
+["dragenter", "dragover"].forEach(eventName => {
+    userUploadArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        userUploadArea.classList.add("dragover");
+    }, false);
+    
+    productUploadArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        productUploadArea.classList.add("dragover");
+    }, false);
+});
+
+["dragleave", "drop"].forEach(eventName => {
+    userUploadArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        userUploadArea.classList.remove("dragover");
+    }, false);
+    
+    productUploadArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        productUploadArea.classList.remove("dragover");
+    }, false);
+});
+
+userUploadArea.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files && files[0]) {
+        userImageInput.files = files;
+        // Dispatch change event to trigger FileReader preview logic
+        userImageInput.dispatchEvent(new Event("change"));
+    }
+});
+
+productUploadArea.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files && files[0]) {
+        productImageInput.files = files;
+        // Dispatch change event to trigger FileReader preview logic
+        productImageInput.dispatchEvent(new Event("change"));
     }
 });
 
