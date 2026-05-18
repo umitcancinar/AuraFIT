@@ -31,22 +31,29 @@ def get_model_name():
     # Attempt to use gemini-2.5-flash or gemini-1.5-flash
     return "gemini-1.5-flash"
 
-async def optimize_vton_prompt(product_title: str, product_desc: str = "") -> str:
+async def optimize_vton_prompt(product_title: str, product_desc: str = "", extra_note: str = None) -> str:
     """
-    Translates product details into an English technical VTON prompt.
+    Translates product details and extra notes into an English technical VTON prompt.
     """
     try:
         model = genai.GenerativeModel(get_model_name())
+        
+        note_instruction = ""
+        if extra_note:
+            note_instruction = f"IMPORTANT USER NOTE: {extra_note}\nYou MUST incorporate this note into the physical description of how the item should be worn or applied."
+            
         prompt = f"""
 You are an expert fashion metadata optimizer. 
-Translate the following Turkish product title and description into a highly precise, technical English VTON description. 
-Focus only on describing the garment itself: its type, fabric, color, patterns, and styling, and fit.
+Translate the following product title and description into a highly precise, technical English VTON description. 
+Focus only on describing the garment/item itself: its type, fabric, color, patterns, styling, and fit.
 Do NOT describe human features or background.
 
 Product Title: {product_title}
 Product Description: {product_desc}
 
-For example, "Erkek Kırmızı Oversize Tişört" -> "A red oversized cotton t-shirt for men, plain solid design, short sleeves, high-quality fabric"
+{note_instruction}
+
+For example, "Red Oversized T-shirt" -> "A red oversized cotton t-shirt, plain solid design, short sleeves, high-quality fabric"
 
 Return ONLY the plain text of the optimized English prompt. Do not include any quotes, markdown, or conversational filler.
 """
@@ -69,56 +76,58 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
         # Load images for Gemini using PIL
         user_img = Image.open(io.BytesIO(user_image_bytes))
         product_img = Image.open(io.BytesIO(product_image_bytes))
+        note_instruction = f"User's Extra Context/Note: {extra_note}" if extra_note else ""
         
         prompt = f"""
-Görevin: Bir kullanıcının fotoğrafını ve satın almak istediği kıyafetin görselini analiz ederek Türkçe 'Kalıp Uyumu, Kombin Önerisi ve Finansal ROI (Giyim Başına Maliyet)' raporu üretmek.
+Your task is to analyze the user's photo and the desired product photo to generate an English 'Fit, Styling, and Financial ROI' report.
 
-Girdiler:
-1. Kullanıcı Fotoğrafı (üzerindeki vücut yapısını, stilini, ten rengini anlamak için)
-2. Ürün Fotoğrafı (almak istediği kıyafet)
-3. Kıyafetin Fiyatı: {price} TL
+Inputs:
+1. User Photo (to understand body type, style, skin tone)
+2. Product Photo (the item they want to try on or buy)
+3. Product Price: {price} USD/EUR (Treat as local currency)
+{note_instruction}
 
-Lütfen analizlerini Türkçe yap ve çıktıyı KESİNLİKLE aşağıdaki JSON şemasında döndür. JSON dışında başka hiçbir açıklama metni, giriş veya çıkış ekleme. Başına veya sonuna markdown kod blokları ekleme, doğrudan geçerli bir JSON döndür.
+Please perform your analysis entirely in ENGLISH and output strictly using the JSON schema below. Do not add any introductory or concluding text, and do NOT wrap the output in markdown code blocks. Output raw, valid JSON only.
 
-JSON Şeması:
+JSON Schema:
 {{
-  "body_type": "Kullanıcının vücut tipi analizi (örn: Atletik, Dikdörtgen, Armut, Kum Saati vb.)",
+  "body_type": "User's body type analysis (e.g., Athletic, Rectangle, Pear, Hourglass, etc.)",
   "fit_analysis": {{
-    "score": 0 ile 100 arasında bir uyum puanı (örn: 85),
-    "title": "Uyum Derecesi (örn: Mükemmel Uyum, Rahat Kesim, Uyumlu Kesim)",
-    "description": "Kıyafetin kullanıcının vücut tipine göre detaylı kalıp/kesim analizi. Kullanıcıya özel beden tavsiyesi (örn: Omuzlar geniş olduğu için tam beden alınmalı, oversize kesim olduğu için bir beden küçük tercih edilebilir)."
+    "score": 0 to 100 representing fit harmony (e.g., 85),
+    "title": "Fit Degree (e.g., Perfect Fit, Relaxed Fit, Tailored Fit)",
+    "description": "Detailed analysis of how the garment/item fits the user's specific body type or features. Include specific sizing advice considering the User's Extra Context/Note if applicable."
   }},
   "styling_suggestions": [
     {{
-      "item": "Kombinlenecek Parça Adı (örn: Siyah Slim-Fit Jean Pantolon)",
-      "description": "Neden bu parçanın seçilmesi gerektiği, kumaş ve renk uyumu.",
+      "item": "Complementary Item Name (e.g., Black Slim-Fit Jeans)",
+      "description": "Why this piece should be chosen, fabric and color harmony.",
       "category": "bottom"
     }},
     {{
-      "item": "Kombinlenecek Ayakkabı (örn: Beyaz Minimalist Deri Sneaker)",
-      "description": "Genel kombini tamamlayacak ayakkabı tarzı.",
+      "item": "Footwear (e.g., Minimalist White Leather Sneakers)",
+      "description": "Shoe style to complete the look.",
       "category": "shoes"
     }},
     {{
-      "item": "Aksesuar Önerisi (örn: Gümüş Metalik Mekanik Kol Saati)",
-      "description": "Kombine şıklık katacak aksesuar detayı.",
+      "item": "Accessory (e.g., Silver Metallic Watch)",
+      "description": "Accessory detail to add elegance.",
       "category": "accessory"
     }},
     {{
-      "item": "Dış Giyim Önerisi (örn: Haki Renk Bomber Ceket)",
-      "description": "Soğuk havalarda kombini bozmayacak tamamlayıcı parça.",
+      "item": "Outerwear (e.g., Khaki Bomber Jacket)",
+      "description": "Complementary piece for colder weather.",
       "category": "outerwear"
     }}
   ],
-  "color_harmony": "Kullanıcının ten rengi, saç tonu ve mevcut tarzına göre ürün renginin uyum derecesi ve stil etkisi.",
+  "color_harmony": "Harmony degree and stylistic impact of the product's color based on the user's skin tone, hair color, and vibe.",
   "financial_roi": {{
     "price": {price},
-    "quality_rating": "Görselden tahmin edilen kumaş kalitesi ve dayanıklılık (1-5 yıldız arası)",
-    "estimated_lifespan_wears": Tahmini yıpranmadan kaç kez giyilebileceği (sayı, örn: 75),
-    "cost_per_wear_10": 10 kez giyilirse giyim başı maliyet (fiyat / 10),
-    "cost_per_wear_30": 30 kez giyilirse giyim başı maliyet (fiyat / 30),
-    "cost_per_wear_50": 50 kez giyilirse giyim başı maliyet (fiyat / 50),
-    "roi_verdict": "Bu fiyat ve tahmin edilen kaliteye göre finansal yatırım tavsiyesi. Giyim sıklığına göre kendini ne kadar sürede amorti edeceğini açıklayan ikna edici bir Türkçe özet."
+    "quality_rating": "Estimated fabric/build quality from the image (1 to 5 stars)",
+    "estimated_lifespan_wears": Estimated times it can be worn before wearing out (number, e.g., 75),
+    "cost_per_wear_10": Cost per wear if worn 10 times (price / 10),
+    "cost_per_wear_30": Cost per wear if worn 30 times (price / 30),
+    "cost_per_wear_50": Cost per wear if worn 50 times (price / 50),
+    "roi_verdict": "Short English advice on whether this is a logical financial wardrobe investment based on versatility and estimated longevity."
   }}
 }}
 """

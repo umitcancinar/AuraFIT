@@ -2258,3 +2258,84 @@ body.light-theme .history-card:hover {
         justify-content: center;
     }
 }
+
+/* ====================================================
+   APPLE CHIC DASHBOARD OVERRIDES
+   ==================================================== */
+.apple-glass {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .apple-glass {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important;
+}
+
+.apple-textarea {
+    min-height: 80px !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    color: var(--text-color);
+    padding: 12px 16px !important;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+[data-theme="light"] .apple-textarea {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+.apple-textarea:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.2) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+}
+[data-theme="light"] .apple-textarea:focus {
+    background: #ffffff !important;
+}
+
+.apple-btn-primary {
+    background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 999px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    padding: 18px 32px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.apple-btn-primary:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+    background: linear-gradient(135deg, #000000 0%, #2c2c2c 100%) !important;
+}
+
+[data-theme="light"] .apple-btn-primary {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%) !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+}
+[data-theme="light"] .apple-btn-primary:hover {
+    background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%) !important;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.notes-container .helper-text {
+    font-size: 0.8rem;
+    color: var(--text-color-light);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.8;
+}

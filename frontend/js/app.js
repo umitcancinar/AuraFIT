@@ -268,6 +268,7 @@ const btnParseLink = document.getElementById("btn-parse-link");
 const productTitle = document.getElementById("product-title");
 const productPrice = document.getElementById("product-price");
 const productDesc = document.getElementById("product-desc");
+const productExtraNotes = document.getElementById("product-extra-notes");
 
 // Core State Panels
 const stateEmpty = document.getElementById("state-empty");
@@ -750,6 +751,7 @@ btnSubmitTryon.addEventListener("click", async () => {
     let pTitle = productTitle.value.trim();
     let pPrice = parseFloat(productPrice.value) || 0.0;
     let pDesc = productDesc.value.trim();
+    let pExtra = productExtraNotes.value.trim();
     
     if (!pTitle || pPrice <= 0) {
         alert(activeLang === "tr" ? "Lütfen kıyafet başlığı ve fiyatını eksiksiz girin." : "Please fill in garment title and price.");
@@ -782,6 +784,9 @@ btnSubmitTryon.addEventListener("click", async () => {
         formData.append("product_title", pTitle);
         formData.append("product_desc", pDesc);
         formData.append("price", pPrice);
+        if (pExtra) {
+            formData.append("extra_note", pExtra);
+        }
         
         if (userImageInput.files[0]) {
             formData.append("user_image", userImageInput.files[0]);

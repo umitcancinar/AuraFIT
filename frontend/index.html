@@ -212,25 +212,25 @@
         <!-- Split Grid Panel Cabin -->
         <main class="main-container">
             <!-- Left Side Configuration panel -->
-            <section class="panel panel-inputs">
+            <section class="panel panel-inputs apple-glass">
                 <div class="panel-header">
-                    <h2><i class="fa-solid fa-sliders header-icon"></i> <span data-i18n="inputs-title">Giriş Yapılandırması</span></h2>
-                    <p data-i18n="inputs-subtitle">Kendi fotoğrafınızı ekleyin ve denemek istediğiniz ürünü seçin.</p>
+                    <h2><i class="fa-brands fa-apple header-icon"></i> Studio Configuration</h2>
+                    <p>Provide your photo, the product, and any special styling requests.</p>
                 </div>
 
                 <!-- STEP 1: USER IMAGE -->
                 <div class="input-group">
-                    <label class="group-label"><span class="step-num">1</span> <span data-i18n="step1-label">Fotoğrafınızı Seçin</span></label>
+                    <label class="group-label"><span class="step-num">1</span> Your Photo</label>
                     <div class="template-selector">
-                        <span class="template-label" data-i18n="quick-models">Hızlı Şablon Mankenler:</span>
+                        <span class="template-label">Quick Templates:</span>
                         <div class="template-grid" id="user-templates">
                             <div class="template-card active" data-filename="model_man.jpg" data-gender="erkek">
-                                <img src="assets/model_man.jpg" alt="Manken Erkek">
-                                <span data-i18n="model-man">Erkek Manken</span>
+                                <img src="assets/model_man.jpg" alt="Model Man">
+                                <span>Male Model</span>
                             </div>
                             <div class="template-card" data-filename="model_woman.jpg" data-gender="kadin">
-                                <img src="assets/model_woman.jpg" alt="Manken Kadın">
-                                <span data-i18n="model-woman">Kadın Manken</span>
+                                <img src="assets/model_woman.jpg" alt="Model Woman">
+                                <span>Female Model</span>
                             </div>
                         </div>
                     </div>
@@ -240,11 +240,11 @@
                         <input type="file" id="user-image-input" accept="image/*" class="file-input-hidden">
                         <div class="upload-placeholder">
                             <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-                            <p class="upload-title" data-i18n="upload-user-title">Kendi Fotoğrafınızı Yükleyin</p>
-                            <p class="upload-desc" data-i18n="upload-user-desc">Sürükleyip bırakın veya göz atın (PNG, JPG)</p>
+                            <p class="upload-title">Upload Your Photo</p>
+                            <p class="upload-desc">Drag & drop or browse (PNG, JPG). Selfies for glasses, full body for shoes.</p>
                         </div>
                         <div class="upload-preview hidden" id="user-upload-preview">
-                            <img src="" alt="Yüklenen Fotoğraf">
+                            <img src="" alt="Uploaded Photo">
                             <button type="button" class="btn-remove-preview" id="btn-remove-user-img">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -254,10 +254,10 @@
 
                 <!-- STEP 2: PRODUCT SELECTION -->
                 <div class="input-group">
-                    <label class="group-label"><span class="step-num">2</span> <span data-i18n="step2-label">Kıyafet Detayları</span></label>
+                    <label class="group-label"><span class="step-num">2</span> Product Details</label>
                     <div class="toggle-tabs">
-                        <button type="button" class="tab-btn active" id="tab-btn-link"><i class="fa-solid fa-link"></i> <span data-i18n="tab-link">Link ile Çözümle</span></button>
-                        <button type="button" class="tab-btn" id="tab-btn-file"><i class="fa-solid fa-file-import"></i> <span data-i18n="tab-file">Görsel Yükle</span></button>
+                        <button type="button" class="tab-btn active" id="tab-btn-link"><i class="fa-solid fa-link"></i> Paste Link</button>
+                        <button type="button" class="tab-btn" id="tab-btn-file"><i class="fa-solid fa-file-import"></i> Upload File</button>
                     </div>
 
                     <!-- Link Panel -->
@@ -265,15 +265,15 @@
                         <div class="link-parser-container">
                             <div class="input-wrapper">
                                 <i class="fa-solid fa-globe input-icon-left"></i>
-                                <input type="text" id="product-url" placeholder="Trendyol, H&M, Amazon vb. ürün linki yapıştırın..." class="premium-input" data-i18n-placeholder="placeholder-url">
+                                <input type="text" id="product-url" placeholder="Paste e-commerce product link..." class="premium-input">
                             </div>
                             <div class="price-link-grid">
                                 <div class="input-wrapper">
-                                    <i class="fa-solid fa-turkish-lira-sign input-icon-left"></i>
-                                    <input type="number" id="product-url-price" placeholder="Fiyat (İsteğe Bağlı)" class="premium-input" data-i18n-placeholder="placeholder-price-opt">
+                                    <i class="fa-solid fa-dollar-sign input-icon-left"></i>
+                                    <input type="number" id="product-url-price" placeholder="Price (Opt)" class="premium-input">
                                 </div>
                                 <button type="button" class="btn-action" id="btn-parse-link">
-                                    <span class="btn-text" data-i18n="btn-parse">Çözümle & Getir</span>
+                                    <span class="btn-text">Parse Data</span>
                                     <i class="fa-solid fa-wand-magic"></i>
                                 </button>
                             </div>
@@ -285,48 +285,57 @@
                         <div class="upload-area" id="product-upload-area">
                             <input type="file" id="product-image-input" accept="image/*" class="file-input-hidden">
                             <div class="upload-placeholder">
-                                <i class="fa-solid fa-shirt upload-icon"></i>
-                                <p class="upload-title" data-i18n="upload-product-title">Kıyafet Görseli Yükleyin</p>
-                                <p class="upload-desc" data-i18n="upload-product-desc">Beyaz arka planlı kıyafet görselleri önerilir</p>
+                                <i class="fa-solid fa-bag-shopping upload-icon"></i>
+                                <p class="upload-title">Upload Product Image</p>
+                                <p class="upload-desc">High quality, isolated backgrounds work best.</p>
                             </div>
                             <div class="upload-preview hidden" id="product-upload-preview">
-                                <img src="" alt="Kıyafet Fotoğrafı">
+                                <img src="" alt="Product Photo">
                                 <button type="button" class="btn-remove-preview" id="btn-remove-product-img">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="manual-inputs-grid">
-                            <input type="text" id="product-title" placeholder="Kıyafet Başlığı (örn: Oversize Mavi Sweatshirt)" class="premium-input" data-i18n-placeholder="placeholder-title">
-                            <input type="number" id="product-price" placeholder="Fiyat (TL)" class="premium-input" data-i18n-placeholder="placeholder-price">
-                            <textarea id="product-desc" placeholder="Kumaş, kesim vb. detaylar (isteğe bağlı)" class="premium-input text-area" data-i18n-placeholder="placeholder-desc"></textarea>
+                            <input type="text" id="product-title" placeholder="Product Title (e.g. Red Oversize Hoodie)" class="premium-input">
+                            <input type="number" id="product-price" placeholder="Price (USD/EUR)" class="premium-input">
+                            <textarea id="product-desc" placeholder="Fabric, cut, brand details (Optional)" class="premium-input text-area"></textarea>
                         </div>
                     </div>
 
                     <!-- Predefined Garments Templates -->
                     <div class="template-selector margin-top-md">
-                        <span class="template-label" data-i18n="quick-garments">Hızlı Deneme Kıyafetleri:</span>
+                        <span class="template-label">Quick Garments:</span>
                         <div class="template-grid" id="product-templates">
-                            <div class="template-card active" data-filename="garment_blue_hoodie.jpg" data-title="Mavi Premium Oversize Hoodie" data-price="899.90" data-desc="Unisex %100 pamuklu, kalın, içi şardonlu mavi hoodie.">
-                                <img src="assets/garment_blue_hoodie.jpg" alt="Mavi Hoodie">
-                                <span data-i18n="garment-blue-hoodie">Mavi Hoodie</span>
+                            <div class="template-card active" data-filename="garment_blue_hoodie.jpg" data-title="Premium Blue Oversize Hoodie" data-price="89.90" data-desc="Unisex 100% cotton, thick, brushed inside blue hoodie.">
+                                <img src="assets/garment_blue_hoodie.jpg" alt="Blue Hoodie">
+                                <span>Blue Hoodie</span>
                             </div>
-                            <div class="template-card" data-filename="garment_red_sweater.jpg" data-title="Kırmızı Örgü Balıkçı Yaka Kazak" data-price="749.90" data-desc="Triko örgü, boğazlı yaka, yumuşak dokulu kırmızı kışlık kazak.">
-                                <img src="assets/garment_red_sweater.jpg" alt="Kırmızı Kazak">
-                                <span data-i18n="garment-red-sweater">Kırmızı Kazak</span>
+                            <div class="template-card" data-filename="garment_red_sweater.jpg" data-title="Red Knit Turtleneck Sweater" data-price="74.90" data-desc="Knitwear, turtleneck, soft textured winter sweater.">
+                                <img src="assets/garment_red_sweater.jpg" alt="Red Sweater">
+                                <span>Red Sweater</span>
                             </div>
-                            <div class="template-card" data-filename="garment_green_dress.jpg" data-title="Zarif Yeşil Keten Yazlık Elbise" data-price="1499.90" data-desc="Askılı, hafif keten kumaş, nefes alabilen yeşil yazlık elbise.">
-                                <img src="assets/garment_green_dress.jpg" alt="Yeşil Elbise">
-                                <span data-i18n="garment-green-dress">Yeşil Elbise</span>
+                            <div class="template-card" data-filename="garment_green_dress.jpg" data-title="Elegant Green Linen Summer Dress" data-price="149.90" data-desc="Sleeveless, light linen fabric, breathable summer dress.">
+                                <img src="assets/garment_green_dress.jpg" alt="Green Dress">
+                                <span>Green Dress</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Submit Button -->
-                <button type="button" class="btn-submit-tryon" id="btn-submit-tryon">
-                    <span data-i18n="btn-submit-tryon">SANAL KABİNİ BAŞLAT</span>
-                    <i class="fa-solid fa-sparkles btn-submit-glow"></i>
+                <!-- STEP 3: EXTRA NOTES -->
+                <div class="input-group">
+                    <label class="group-label"><span class="step-num">3</span> Extra Context & Styling Notes</label>
+                    <div class="notes-container">
+                        <textarea id="product-extra-notes" placeholder="E.g. 'These are sunglasses, please apply them to my face.' or 'I want to try these shoes, use full-body application.' or 'Make it fit tighter.'" class="premium-input text-area apple-textarea"></textarea>
+                        <p class="helper-text"><i class="fa-solid fa-circle-info"></i> Gemini AI will use this note to give tailored style and ROI advice.</p>
+                    </div>
+                </div>
+
+                <!-- STEP 4: SUBMIT BUTTON -->
+                <button type="button" class="btn-submit-tryon apple-btn-primary" id="btn-submit-tryon">
+                    <span>GENERATE VIRTUAL CABIN</span>
+                    <i class="fa-solid fa-sparkles"></i>
                 </button>
             </section>
 

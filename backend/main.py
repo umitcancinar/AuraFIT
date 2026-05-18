@@ -295,6 +295,7 @@ async def try_on(
     product_title: str = Form(...),
     product_desc: str = Form(""),
     price: float = Form(...),
+    extra_note: Optional[str] = Form(None),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
@@ -320,7 +321,7 @@ async def try_on(
         
         # 1. OPTIMIZE PROMPT VIA GEMINI
         logger.info("Step 1: Translating and optimizing prompt via Gemini...")
-        optimized_prompt = await optimize_vton_prompt(product_title, product_desc)
+        optimized_prompt = await optimize_vton_prompt(product_title, product_desc, extra_note)
         
         # Read files for Gemini multi-modal processing
         with open(user_path, "rb") as f:
@@ -342,7 +343,8 @@ async def try_on(
         report_task = generate_styling_and_roi_report(
             user_image_bytes=user_bytes,
             product_image_bytes=product_bytes,
-            price=price
+            price=price,
+            extra_note=extra_note
         )
         
         # Gather results
