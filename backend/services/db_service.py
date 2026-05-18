@@ -10,6 +10,20 @@ import jwt
 # Setup logger
 logger = logging.getLogger(__name__)
 
+# Monkeypatch pg8000 to strip channel_binding if passed by SQLAlchemy to prevent crashes
+try:
+    import pg8000
+    original_connect = pg8000.connect
+    def safe_connect(*args, **kwargs):
+        kwargs.pop("channel_binding", None)
+        return original_connect(*args, **kwargs)
+    pg8000.connect = safe_connect
+    if hasattr(pg8000, "dbapi"):
+        pg8000.dbapi.connect = safe_connect
+    logger.info("Successfully monkeypatched pg8000.connect to prevent channel_binding crashes.")
+except Exception as e:
+    logger.error(f"Failed to monkeypatch pg8000: {e}")
+
 # Retrieve environmental configs
 DATABASE_URL = os.getenv("DATABASE_URL")
 use_sqlite_fallback = False
