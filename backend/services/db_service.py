@@ -14,16 +14,15 @@ logger = logging.getLogger(__name__)
 DATABASE_URL = os.getenv("DATABASE_URL")
 use_sqlite_fallback = False
 
-# Force SQLite on Vercel to guarantee 100% stability and bypass psycopg2 binary driver crashes
-if os.environ.get("VERCEL") or os.path.exists("/var/task") or (DATABASE_URL and "var/task" in DATABASE_URL):
-    DATABASE_URL = "sqlite:////tmp/aurafit.db"
-    use_sqlite_fallback = True
-
+# Force SQLite only if no DATABASE_URL is provided
 if not DATABASE_URL:
     use_sqlite_fallback = True
 else:
     if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+pg8000://", 1)
+    elif DATABASE_URL.startswith("postgresql://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
+        
     if "postgresql" in DATABASE_URL and "sslmode" not in DATABASE_URL:
         if "?" in DATABASE_URL:
             DATABASE_URL += "&sslmode=require"

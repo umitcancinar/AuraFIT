@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Gemini API
-api_key = os.getenv("GEMINI_API_KEY")
+api_key = os.getenv("GEMINI_API_KEY", "").strip()
 if _GEMINI_AVAILABLE and api_key:
     genai.configure(api_key=api_key)
     logger.info("Gemini API configured successfully.")

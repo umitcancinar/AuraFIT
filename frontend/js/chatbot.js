@@ -188,13 +188,19 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, lang: lang })
             });
+            
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            
             const data = await res.json();
             hideTyping();
             
             addMsg(data.response || transDict.chat_default_resp || "I'm styling your next smart outfit!", false);
         } catch (error) {
+            console.error("Chatbot API Error:", error);
             hideTyping();
-            addMsg(transDict.chat_error || "Oops! There was an issue reaching my AI database.", false);
+            addMsg(transDict.chat_error || "Sistemde anlık bir gecikme var, lütfen tekrar deneyin.", false);
         }
     }
 
