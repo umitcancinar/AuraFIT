@@ -55,8 +55,8 @@ except Exception as e:
     print(f"Directory creation warning (safely ignored for Vercel): {str(e)}")
 
 # Mount Static Files
-app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
-app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR, check_dir=False), name="uploads")
+app.mount("/assets", StaticFiles(directory=ASSETS_DIR, check_dir=False), name="assets")
 
 # Import Services
 from services.gemini_service import optimize_vton_prompt, generate_styling_and_roi_report, get_chatbot_reply
