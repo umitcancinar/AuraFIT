@@ -264,6 +264,24 @@ def get_me(current_user: User = Depends(get_current_user)):
         }
     }
 
+@app.get("/api/debug/db")
+def debug_db(db: Session = Depends(get_db)):
+    """Returns the type of database connected (for debugging only)."""
+    try:
+        from services.db_service import DATABASE_URL
+        # Don't return the full URL for security, just the dialect
+        dialect = DATABASE_URL.split("://")[0]
+        # Count users to see if data exists
+        user_count = db.query(User).count()
+        return {
+            "status": "success", 
+            "database_type": dialect, 
+            "user_count": user_count,
+            "message": "Connected successfully to the database."
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/api/history")
 def get_history(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not current_user:
@@ -411,43 +429,7 @@ async def try_on(
         logger.error(f"Error in try_on: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Sanal kabin giydirme sırasında bir hata oluştu: {str(e)}")
 
-@app.post("/api/parse-link")
-async def parse_link(req: LinkRequest):
-    """
-    Parses product information from e-commerce links (Trendyol, H&M, LCW, Amazon, etc.).
-    Avoids CAPTCHA blocks with an intelligent, interactive simulated database + regex resolver.
-    """
-    url_lower = req.url.lower()
-    
-    # Check simulated keywords for a smart mock match
-    for p in SIMULATED_PRODUCTS:
-        for kw in p["url_keywords"]:
-            if kw in url_lower:
-                logger.info(f"Smart url match found for keyword '{kw}': {p['title']}")
-                price = req.price if req.price > 0 else p["price"]
-                
-                return {
-                    "status": "success",
-                    "source": "E-Commerce Smart Parser",
-                    "title": p["title"],
-                    "description": p["description"],
-                    "price": price,
-                    "image_url": f"/assets/{p['image']}",
-                    "simulated": True
-                }
-                
-    # Default fallback to prevent failure
-    logger.info("No URL keyword matches. Returning premium fallback product details.")
-    price = req.price if req.price > 0 else 1299.90
-    return {
-        "status": "success",
-        "source": "E-Commerce Smart Parser (Simüle)",
-        "title": "Premium Denim Klasik Ceket",
-        "description": "Yüksek kaliteli pamuklu kot kumaş, vintage düğme detayları ve zamansız tasarımıyla gardırobunuzun en dayanıklı üyesi.",
-        "price": price,
-        "image_url": "/assets/garment_blue_jacket.jpg",
-        "simulated": True
-    }
+
 
 @app.post("/api/chat")
 async def chat_endpoint(req: ChatRequest):

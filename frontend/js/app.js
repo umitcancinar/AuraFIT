@@ -10,7 +10,6 @@ const API_BASE = window.location.origin.includes("localhost") || window.location
 // App State
 let selectedUserTemplate = "model_man.jpg";
 let selectedProductTemplate = "garment_blue_hoodie.jpg";
-let parsedProductImage = null; // Stored if parsed from URL
 let currentProductPrice = 0.0;
 
 // SaaS State variables
@@ -252,17 +251,6 @@ const userUploadPreview = document.getElementById("user-upload-preview");
 const productUploadPreview = document.getElementById("product-upload-preview");
 const btnRemoveUserImg = document.getElementById("btn-remove-user-img");
 const btnRemoveProductImg = document.getElementById("btn-remove-product-img");
-
-// Toggle Tabs
-const tabBtnLink = document.getElementById("tab-btn-link");
-const tabBtnFile = document.getElementById("tab-btn-file");
-const panelLink = document.getElementById("panel-link");
-const panelFile = document.getElementById("panel-file");
-
-// URL Parser Elements
-const productUrl = document.getElementById("product-url");
-const productUrlPrice = document.getElementById("product-url-price");
-const btnParseLink = document.getElementById("btn-parse-link");
 
 // Manual Input Elements
 const productTitle = document.getElementById("product-title");
@@ -606,7 +594,6 @@ productTemplates.forEach(card => {
         
         productImageInput.value = "";
         productUploadPreview.classList.add("hidden");
-        parsedProductImage = null;
     });
 });
 
@@ -650,7 +637,6 @@ productImageInput.addEventListener("change", () => {
             
             productTemplates.forEach(c => c.classList.remove("active"));
             selectedProductTemplate = null;
-            parsedProductImage = null;
         };
         reader.readAsDataURL(file);
     }
@@ -671,70 +657,6 @@ btnRemoveProductImg.addEventListener("click", (e) => {
 });
 
 /* ----------------------------------------------------
-   6. TOGGLE TABS (LINK VS FILE)
-   ---------------------------------------------------- */
-tabBtnLink.addEventListener("click", () => {
-    tabBtnLink.classList.add("active");
-    tabBtnFile.classList.remove("active");
-    panelLink.classList.remove("hidden");
-    panelFile.classList.add("hidden");
-});
-
-tabBtnFile.addEventListener("click", () => {
-    tabBtnFile.classList.add("active");
-    tabBtnLink.classList.remove("active");
-    panelFile.classList.remove("hidden");
-    panelLink.classList.add("hidden");
-});
-
-/* ----------------------------------------------------
-   7. E-COMMERCE LINK RESOLVER (API INTEGRATION)
-   ---------------------------------------------------- */
-btnParseLink.addEventListener("click", async () => {
-    const urlVal = productUrl.value.trim();
-    if (!urlVal) {
-        alert(activeLang === "tr" ? "Lütfen geçerli bir e-ticaret ürün linki girin." : "Please enter a valid e-commerce product link.");
-        return;
-    }
-
-    const priceVal = parseFloat(productUrlPrice.value) || 0.0;
-    btnParseLink.disabled = true;
-    btnParseLink.innerHTML = `<span class="btn-text">${activeLang === 'tr' ? 'Çözümleniyor...' : 'Parsing...'}</span> <i class="fa-solid fa-spinner fa-spin"></i>`;
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/parse-link`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: urlVal, price: priceVal })
-        });
-        
-        if (!response.ok) throw new Error("Link parsing error.");
-        
-        const data = await response.json();
-        
-        if (data.status === "success") {
-            productTitle.value = data.title;
-            productPrice.value = data.price;
-            productDesc.value = data.description;
-            parsedProductImage = data.image_url;
-            
-            tabBtnFile.click();
-            productUploadPreview.querySelector("img").src = `${API_BASE}${data.image_url}`;
-            productUploadPreview.classList.remove("hidden");
-            
-            productTemplates.forEach(c => c.classList.remove("active"));
-            selectedProductTemplate = null;
-        }
-    } catch (err) {
-        console.error(err);
-        alert(activeLang === "tr" ? "E-Ticaret linki çözümlenemedi. Görsel yükleyerek devam edebilirsiniz." : "E-Commerce link could not be parsed. You can upload clothes manually.");
-    } finally {
-        btnParseLink.disabled = false;
-        btnParseLink.innerHTML = `<span class="btn-text">${activeLang === 'tr' ? 'Çözümle & Getir' : 'Parse & Load'}</span> <i class="fa-solid fa-wand-magic"></i>`;
-    }
-});
-
-/* ----------------------------------------------------
    8. ASYNC VTON SANAL KABIN EXECUTION
    ---------------------------------------------------- */
 btnSubmitTryon.addEventListener("click", async () => {
@@ -743,7 +665,7 @@ btnSubmitTryon.addEventListener("click", async () => {
         return;
     }
     
-    if (!selectedProductTemplate && !productImageInput.files[0] && !parsedProductImage) {
+    if (!selectedProductTemplate && !productImageInput.files[0]) {
         alert(activeLang === "tr" ? "Lütfen denenecek kıyafeti belirleyin." : "Please choose the garment to try on.");
         return;
     }
@@ -800,10 +722,6 @@ btnSubmitTryon.addEventListener("click", async () => {
         
         if (productImageInput.files[0]) {
             formData.append("product_image", productImageInput.files[0]);
-        } else if (parsedProductImage) {
-            const response = await fetch(`${API_BASE}${parsedProductImage}`);
-            const blob = await response.blob();
-            formData.append("product_image", new File([blob], "parsed_product.jpg", { type: "image/jpeg" }));
         } else {
             const response = await fetch(`assets/${selectedProductTemplate}`);
             const blob = await response.blob();
