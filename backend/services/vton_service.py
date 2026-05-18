@@ -157,11 +157,14 @@ async def generate_blended_fallback(user_image_path: str, product_image_path: st
                     newData.append(item)
         product_rgba.putdata(newData)
         
-        # 2. IDENTIFY CATEGORY BY FILENAME/PATH SENSITIVITY
+        # 2. IDENTIFY CATEGORY BY FILENAME & SEMANTIC PROMPT TEXT SENSITIVITY
         u_width, u_height = user_img.size
         
+        # Combine filename and optimized prompt to prevent generic uploads (like 1.png) from misclassifying
+        search_string = (filename_lower + " " + prompt.lower()).strip()
+        
         # Context-aware dimensions and placement
-        if any(x in filename_lower for x in ["sunglasses", "glasses", "gozluk", "gözlük", "glass"]):
+        if any(x in search_string for x in ["sunglasses", "glasses", "gozluk", "gözlük", "glass", "eyewear", "spectacles"]):
             # Eyewear: align to face / eye level
             g_target_width = int(u_width * 0.32)
             aspect_ratio = product_rgba.height / product_rgba.width
@@ -169,7 +172,7 @@ async def generate_blended_fallback(user_image_path: str, product_image_path: st
             paste_x = int((u_width - g_target_width) / 2)
             # Standard head shot eye level is around 25-28% of height
             paste_y = int(u_height * 0.26)
-        elif any(x in filename_lower for x in ["shoe", "shoes", "ayakkabi", "sneaker", "boot"]):
+        elif any(x in search_string for x in ["shoe", "shoes", "ayakkabi", "ayakkabı", "sneaker", "sneakers", "boot", "boots", "footwear", "babet", "topuklu"]):
             # Footwear: align to feet
             g_target_width = int(u_width * 0.35)
             aspect_ratio = product_rgba.height / product_rgba.width
