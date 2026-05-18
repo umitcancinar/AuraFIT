@@ -66,7 +66,7 @@ Return ONLY the plain text of the optimized English prompt. Do not include any q
         # Simple fallback
         return f"A high-quality fashion garment, {product_title}"
 
-async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image_bytes: bytes, price: float) -> dict:
+async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image_bytes: bytes, price: float, extra_note: str = None) -> dict:
     """
     Analyzes user body type, clothing fit, styling harmony, and financial ROI using Gemini.
     """

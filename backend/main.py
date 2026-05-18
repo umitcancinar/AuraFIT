@@ -78,8 +78,8 @@ try:
     logger.info("✅ gemini_service imported successfully")
 except Exception as _import_err:
     logger.error(f"⚠️ gemini_service import failed: {_import_err}")
-    async def optimize_vton_prompt(product_title, product_desc=""): return f"A fashion garment: {product_title}"
-    async def generate_styling_and_roi_report(user_image_bytes, product_image_bytes, price):
+    async def optimize_vton_prompt(product_title, product_desc="", extra_note=None): return f"A fashion garment: {product_title}"
+    async def generate_styling_and_roi_report(user_image_bytes, product_image_bytes, price, extra_note=None):
         return {"body_type": "Standart", "fit_analysis": {"score": 85, "title": "Uyumlu", "description": "Analiz servisi geçici olarak kullanılamıyor."}, "styling_suggestions": [], "color_harmony": "N/A", "financial_roi": {"price": price, "quality_rating": "N/A", "estimated_lifespan_wears": 50, "cost_per_wear_10": round(price/10,2), "cost_per_wear_30": round(price/30,2), "cost_per_wear_50": round(price/50,2), "roi_verdict": "Analiz servisi geçici olarak kullanılamıyor."}}
     async def get_chatbot_reply(user_message, lang="tr"):
         return "Merhaba! Şu anda yapay zeka servisine bağlanılamıyor. Lütfen biraz sonra tekrar deneyin." if lang == "tr" else "Hello! AI service is temporarily unavailable. Please try again shortly."
