@@ -214,23 +214,23 @@
             <!-- Left Side Configuration panel -->
             <section class="panel panel-inputs apple-glass">
                 <div class="panel-header">
-                    <h2><i class="fa-brands fa-apple header-icon"></i> Studio Configuration</h2>
-                    <p>Provide your photo, the product, and any special styling requests.</p>
+                    <h2><i class="fa-brands fa-apple header-icon"></i> <span data-i18n="inputs-title">Studio Configuration</span></h2>
+                    <p data-i18n="inputs-subtitle">Provide your photo, the product, and any special styling requests.</p>
                 </div>
 
                 <!-- STEP 1: USER IMAGE -->
                 <div class="input-group">
-                    <label class="group-label"><span class="step-num">1</span> Your Photo</label>
+                    <label class="group-label"><span class="step-num">1</span> <span data-i18n="step1-label">Your Photo</span></label>
                     <div class="template-selector">
-                        <span class="template-label">Quick Templates:</span>
+                        <span class="template-label" data-i18n="quick-models">Quick Templates:</span>
                         <div class="template-grid" id="user-templates">
                             <div class="template-card active" data-filename="model_man.jpg" data-gender="erkek">
                                 <img src="assets/model_man.jpg" alt="Model Man">
-                                <span>Male Model</span>
+                                <span data-i18n="model-man">Male Model</span>
                             </div>
                             <div class="template-card" data-filename="model_woman.jpg" data-gender="kadin">
                                 <img src="assets/model_woman.jpg" alt="Model Woman">
-                                <span>Female Model</span>
+                                <span data-i18n="model-woman">Female Model</span>
                             </div>
                         </div>
                     </div>
@@ -240,8 +240,8 @@
                         <input type="file" id="user-image-input" accept="image/*" class="file-input-hidden">
                         <div class="upload-placeholder">
                             <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-                            <p class="upload-title">Upload Your Photo</p>
-                            <p class="upload-desc">Drag & drop or browse (PNG, JPG). Selfies for glasses, full body for shoes.</p>
+                            <p class="upload-title" data-i18n="upload-user-title">Upload Your Photo</p>
+                            <p class="upload-desc" data-i18n="upload-user-desc">Drag & drop or browse (PNG, JPG). Selfies for glasses, full body for shoes.</p>
                         </div>
                         <div class="upload-preview hidden" id="user-upload-preview">
                             <img src="" alt="Uploaded Photo">
@@ -254,15 +254,15 @@
 
                 <!-- STEP 2: PRODUCT SELECTION -->
                 <div class="input-group">
-                    <label class="group-label"><span class="step-num">2</span> Product Details</label>
+                    <label class="group-label"><span class="step-num">2</span> <span data-i18n="step2-label">Product Details</span></label>
                     <!-- Manual File Upload Panel -->
                     <div class="tab-content" id="panel-file">
                         <div class="upload-area" id="product-upload-area">
                             <input type="file" id="product-image-input" accept="image/*" class="file-input-hidden">
                             <div class="upload-placeholder">
                                 <i class="fa-solid fa-bag-shopping upload-icon"></i>
-                                <p class="upload-title">Upload Product Image</p>
-                                <p class="upload-desc">High quality, isolated backgrounds work best.</p>
+                                <p class="upload-title" data-i18n="upload-product-title">Upload Product Image</p>
+                                <p class="upload-desc" data-i18n="upload-product-desc">High quality, isolated backgrounds work best.</p>
                             </div>
                             <div class="upload-preview hidden" id="product-upload-preview">
                                 <img src="" alt="Product Photo">
@@ -272,27 +272,27 @@
                             </div>
                         </div>
                         <div class="manual-inputs-grid">
-                            <input type="text" id="product-title" placeholder="Product Title (e.g. Red Oversize Hoodie)" class="premium-input">
-                            <input type="number" id="product-price" placeholder="Price (USD/EUR)" class="premium-input">
-                            <textarea id="product-desc" placeholder="Fabric, cut, brand details (Optional)" class="premium-input text-area"></textarea>
+                            <input type="text" id="product-title" placeholder="Product Title (e.g. Red Oversize Hoodie)" data-i18n-placeholder="placeholder-title" class="premium-input">
+                            <input type="number" id="product-price" placeholder="Price (USD/EUR)" data-i18n-placeholder="placeholder-price" class="premium-input">
+                            <textarea id="product-desc" placeholder="Fabric, cut, brand details (Optional)" data-i18n-placeholder="placeholder-desc" class="premium-input text-area"></textarea>
                         </div>
                     </div>
 
                     <!-- Predefined Garments Templates -->
                     <div class="template-selector margin-top-md">
-                        <span class="template-label">Quick Garments:</span>
+                        <span class="template-label" data-i18n="quick-garments">Quick Garments:</span>
                         <div class="template-grid" id="product-templates">
                             <div class="template-card active" data-filename="garment_blue_hoodie.jpg" data-title="Premium Blue Oversize Hoodie" data-price="89.90" data-desc="Unisex 100% cotton, thick, brushed inside blue hoodie.">
                                 <img src="assets/garment_blue_hoodie.jpg" alt="Blue Hoodie">
-                                <span>Blue Hoodie</span>
+                                <span data-i18n="garment-blue-hoodie">Blue Hoodie</span>
                             </div>
                             <div class="template-card" data-filename="garment_red_sweater.jpg" data-title="Red Knit Turtleneck Sweater" data-price="74.90" data-desc="Knitwear, turtleneck, soft textured winter sweater.">
                                 <img src="assets/garment_red_sweater.jpg" alt="Red Sweater">
-                                <span>Red Sweater</span>
+                                <span data-i18n="garment-red-sweater">Red Sweater</span>
                             </div>
                             <div class="template-card" data-filename="garment_green_dress.jpg" data-title="Elegant Green Linen Summer Dress" data-price="149.90" data-desc="Sleeveless, light linen fabric, breathable summer dress.">
                                 <img src="assets/garment_green_dress.jpg" alt="Green Dress">
-                                <span>Green Dress</span>
+                                <span data-i18n="garment-green-dress">Green Dress</span>
                             </div>
                         </div>
                     </div>
@@ -300,16 +300,16 @@
 
                 <!-- STEP 3: EXTRA NOTES -->
                 <div class="input-group">
-                    <label class="group-label"><span class="step-num">3</span> Extra Context & Styling Notes</label>
+                    <label class="group-label"><span class="step-num">3</span> <span data-i18n="step3-label">Extra Context & Styling Notes</span></label>
                     <div class="notes-container">
-                        <textarea id="product-extra-notes" placeholder="E.g. 'These are sunglasses, please apply them to my face.' or 'I want to try these shoes, use full-body application.' or 'Make it fit tighter.'" class="premium-input text-area apple-textarea"></textarea>
-                        <p class="helper-text"><i class="fa-solid fa-circle-info"></i> Gemini AI will use this note to give tailored style and ROI advice.</p>
+                        <textarea id="product-extra-notes" placeholder="E.g. 'These are sunglasses, please apply them to my face.' or 'I want to try these shoes, use full-body application.' or 'Make it fit tighter.'" data-i18n-placeholder="placeholder-extra-notes" class="premium-input text-area apple-textarea"></textarea>
+                        <p class="helper-text"><i class="fa-solid fa-circle-info"></i> <span data-i18n="helper-styling-notes">Gemini AI will use this note to give tailored style and ROI advice.</span></p>
                     </div>
                 </div>
 
                 <!-- STEP 4: SUBMIT BUTTON -->
                 <button type="button" class="btn-submit-tryon apple-btn-primary" id="btn-submit-tryon">
-                    <span>GENERATE VIRTUAL CABIN</span>
+                    <span data-i18n="btn-submit-tryon">GENERATE VIRTUAL CABIN</span>
                     <i class="fa-solid fa-sparkles"></i>
                 </button>
             </section>

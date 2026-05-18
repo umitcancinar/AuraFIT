@@ -2271,7 +2271,7 @@ body.light-theme .history-card:hover {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
 }
 
-[data-theme="light"] .apple-glass {
+body.light-theme .apple-glass {
     background: rgba(255, 255, 255, 0.6) !important;
     border: 1px solid rgba(255, 255, 255, 0.4) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important;
@@ -2282,12 +2282,12 @@ body.light-theme .history-card:hover {
     background: rgba(0, 0, 0, 0.2) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 12px !important;
-    color: var(--text-color);
+    color: var(--text-primary);
     padding: 12px 16px !important;
     transition: all 0.3s ease;
     font-size: 0.95rem;
 }
-[data-theme="light"] .apple-textarea {
+body.light-theme .apple-textarea {
     background: rgba(255, 255, 255, 0.8) !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
@@ -2317,7 +2317,7 @@ body.light-theme .history-card:hover {
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-[data-theme="light"] .apple-glass, [data-theme="light"] .panel-results {
+body.light-theme .apple-glass, body.light-theme .panel-results {
     background: rgba(255, 255, 255, 0.7) !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.06) !important;
@@ -2333,7 +2333,7 @@ body.light-theme .history-card:hover {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-[data-theme="light"] .panel-header h2 {
+body.light-theme .panel-header h2 {
     background: linear-gradient(135deg, #000 0%, #606060 100%);
     -webkit-background-clip: text;
 }
@@ -2351,7 +2351,7 @@ body.light-theme .history-card:hover {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--text-color);
+    color: var(--text-primary);
 }
 .step-num {
     background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
@@ -2379,7 +2379,7 @@ body.light-theme .history-card:hover {
     position: relative;
     overflow: hidden;
 }
-[data-theme="light"] .upload-area {
+body.light-theme .upload-area {
     background: rgba(0, 0, 0, 0.02);
     border: 2px dashed rgba(0, 0, 0, 0.1);
 }
@@ -2426,7 +2426,7 @@ body.light-theme .history-card:hover {
     align-items: center;
     gap: 8px;
 }
-[data-theme="light"] .template-card {
+body.light-theme .template-card {
     background: rgba(0, 0, 0, 0.03);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -2462,12 +2462,12 @@ body.light-theme .history-card:hover {
     background: rgba(0, 0, 0, 0.2) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 14px !important;
-    color: var(--text-color);
+    color: var(--text-primary);
     padding: 14px 18px !important;
     font-size: 0.95rem;
     transition: all 0.3s ease;
 }
-[data-theme="light"] .premium-input {
+body.light-theme .premium-input {
     background: rgba(255, 255, 255, 0.8) !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
@@ -2525,19 +2525,19 @@ body.light-theme .history-card:hover {
     transform: translateY(1px) scale(0.98) !important;
 }
 
-[data-theme="light"] .apple-btn-primary {
+body.light-theme .apple-btn-primary {
     background: linear-gradient(135deg, #000000 0%, #333333 100%) !important;
     color: #ffffff !important;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
 }
-[data-theme="light"] .apple-btn-primary:hover {
+body.light-theme .apple-btn-primary:hover {
     background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%) !important;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
 }
 
 .notes-container .helper-text {
     font-size: 0.85rem;
-    color: var(--text-color-light);
+    color: var(--text-secondary);
     margin-top: 10px;
     display: flex;
     align-items: center;
