@@ -132,20 +132,32 @@ async def generate_blended_fallback(user_image_path: str, product_image_path: st
         user_img = Image.open(user_image_path).convert("RGBA")
         product_img = Image.open(product_image_path)
         
-        # 1. REMOVE WHITE BACKGROUND OF THE PRODUCT (Color Keying)
+        # 1. REMOVE BACKGROUND & DROP SHADOWS OF THE PRODUCT (Intelligent Color Keying)
+        filename_lower = os.path.basename(product_image_path).lower()
+        is_eyewear = any(x in filename_lower for x in ["sunglasses", "glasses", "gozluk", "gözlük", "glass"])
+        
         product_rgba = product_img.convert("RGBA")
         datas = product_rgba.getdata()
         newData = []
         for item in datas:
-            # If the pixel is close to pure white (R,G,B > 235), make it transparent
-            if item[0] > 235 and item[1] > 235 and item[2] > 235:
-                newData.append((255, 255, 255, 0))
+            r, g, b, a = item
+            if is_eyewear:
+                # Aggressive keying for eyewear to completely wipe out grey reflections & drop shadows
+                is_bright = r > 155 and g > 155 and b > 155
+                is_neutral = abs(r - g) < 25 and abs(g - b) < 25 and abs(r - b) < 25
+                if is_bright and is_neutral:
+                    newData.append((255, 255, 255, 0))
+                else:
+                    newData.append(item)
             else:
-                newData.append(item)
+                # Safe keying for clothes/shoes to preserve white fabrics/details
+                if r > 240 and g > 240 and b > 240:
+                    newData.append((255, 255, 255, 0))
+                else:
+                    newData.append(item)
         product_rgba.putdata(newData)
         
         # 2. IDENTIFY CATEGORY BY FILENAME/PATH SENSITIVITY
-        filename_lower = os.path.basename(product_image_path).lower()
         u_width, u_height = user_img.size
         
         # Context-aware dimensions and placement
