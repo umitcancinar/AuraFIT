@@ -54,9 +54,13 @@ try:
 except Exception as e:
     print(f"Directory creation warning (safely ignored for Vercel): {str(e)}")
 
-# Mount Static Files
-app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR, check_dir=False), name="uploads")
-app.mount("/assets", StaticFiles(directory=ASSETS_DIR, check_dir=False), name="assets")
+# Mount Static Files (only needed for local dev — Vercel serves frontend via @vercel/static)
+if not os.environ.get("VERCEL"):
+    try:
+        app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR, check_dir=False), name="uploads")
+        app.mount("/assets", StaticFiles(directory=ASSETS_DIR, check_dir=False), name="assets")
+    except Exception as _mount_err:
+        print(f"StaticFiles mount warning: {_mount_err}")
 
 # Import Services — wrapped in try/except to guarantee module ALWAYS loads on Vercel
 # If any heavy dependency (PIL, gradio_client, google.generativeai) fails,
