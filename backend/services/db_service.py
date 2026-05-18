@@ -79,16 +79,19 @@ class TryOn(Base):
 # DATABASE UTILITIES
 # ----------------------------------------------------
 
+db_init_error = None
+
 def init_db():
     """
     Initializes PostgreSQL tables automatically. Called at server startup.
     Features robust automatic self-healing fallback to SQLite on write failures.
     """
-    global engine, SessionLocal
+    global engine, SessionLocal, db_init_error
     try:
         Base.metadata.create_all(bind=engine)
         logger.info(f"Base.metadata.create_all successful.")
     except Exception as e:
+        db_init_error = str(e)
         logger.error(f"⚠️ Database initialization failed with primary URL: {str(e)}")
         # If it was a PostgreSQL database and failed, fall back to SQLite!
         if engine and not engine.url.drivername.startswith("sqlite"):
