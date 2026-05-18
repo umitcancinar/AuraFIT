@@ -178,11 +178,27 @@ async def generate_blended_fallback(user_image_path: str, product_image_path: st
             paste_y = int(u_height * 0.78)
         else:
             # Garments: chest/torso area
-            g_target_width = int(u_width * 0.62)
-            aspect_ratio = product_rgba.height / product_rgba.width
-            g_target_height = int(g_target_width * aspect_ratio)
-            paste_x = int((u_width - g_target_width) / 2)
-            paste_y = int(u_height * 0.36)
+            # If the user image is one of our high-quality template mankens, we align to their exact shoulders!
+            user_filename_lower = os.path.basename(user_image_path).lower()
+            if "model_man" in user_filename_lower:
+                g_target_width = int(u_width * 0.94) # Spans his wide shoulders perfectly!
+                aspect_ratio = product_rgba.height / product_rgba.width
+                g_target_height = int(g_target_width * aspect_ratio)
+                paste_x = int((u_width - g_target_width) / 2)
+                paste_y = int(u_height * 0.20) # Perfectly aligns with the neck line!
+            elif "model_woman" in user_filename_lower:
+                g_target_width = int(u_width * 0.88)
+                aspect_ratio = product_rgba.height / product_rgba.width
+                g_target_height = int(g_target_width * aspect_ratio)
+                paste_x = int((u_width - g_target_width) / 2)
+                paste_y = int(u_height * 0.22)
+            else:
+                # Custom uploaded photo: safe default chest-to-shoulder scaling and alignment
+                g_target_width = int(u_width * 0.82)
+                aspect_ratio = product_rgba.height / product_rgba.width
+                g_target_height = int(g_target_width * aspect_ratio)
+                paste_x = int((u_width - g_target_width) / 2)
+                paste_y = int(u_height * 0.24)
             
         product_resized = product_rgba.resize((g_target_width, g_target_height), Image.Resampling.LANCZOS)
         
