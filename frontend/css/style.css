@@ -1145,7 +1145,7 @@ body.light-theme .btn-action {
 }
 
 /* RIGHT PANEL: STATES & LANDING */
-.panel-results {
+.panel-inputs, .panel-results {
     position: relative;
     overflow-y: auto;
     max-height: 85vh;
@@ -2218,7 +2218,7 @@ body.light-theme .history-card:hover {
         letter-spacing: -1px;
     }
     
-    .panel-results {
+    .panel-inputs, .panel-results {
         max-height: none;
     }
     
