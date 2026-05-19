@@ -10,6 +10,7 @@ const API_BASE = window.location.origin.includes("localhost") || window.location
 // App State
 let selectedUserTemplate = "model_man.jpg";
 let selectedProductTemplate = "garment_blue_hoodie.jpg";
+let selectedScrapedImageUrl = null;
 let currentProductPrice = 0.0;
 
 // SaaS State variables
@@ -36,6 +37,11 @@ const translations = {
         "upload-user-title": "Kendi Fotoğrafınızı Yükleyin",
         "upload-user-desc": "Sürükleyip bırakın veya göz atın (PNG, JPG)",
         "step2-label": "Kıyafet Detayları",
+        "tab-link-title": "E-Ticaret Linki",
+        "tab-manual-title": "Manuel Yükle",
+        "placeholder-link-input": "Trendyol, H&M, Zara, Amazon linkini yapıştırın...",
+        "btn-parse-link": "Çözümle",
+        "carousel-select-prompt": "Görseller çözümlendi! Denemek istediğinizi seçin:",
         "tab-link": "Link ile Çözümle",
         "tab-file": "Görsel Yükle",
         "placeholder-url": "Trendyol, H&M, Amazon vb. ürün linki yapıştırın...",
@@ -156,6 +162,11 @@ const translations = {
         "upload-user-title": "Upload Your Own Photo",
         "upload-user-desc": "Drag and drop or browse (PNG, JPG)",
         "step2-label": "Garment Details",
+        "tab-link-title": "E-Commerce Link",
+        "tab-manual-title": "Manual Upload",
+        "placeholder-link-input": "Paste Trendyol, H&M, Zara, Amazon link...",
+        "btn-parse-link": "Analyze",
+        "carousel-select-prompt": "Images parsed! Choose which one to try on:",
         "tab-link": "Parse URL Link",
         "tab-file": "Upload Image",
         "placeholder-url": "Paste Trendyol, H&M, Amazon product link...",
@@ -657,6 +668,130 @@ productTemplates.forEach(card => {
     });
 });
 
+/* ----------------------------------------------------
+   PRODUCT DETAILS TAB SWITCHING & LINK SCRAPER (Strategy 3)
+   ---------------------------------------------------- */
+const tabBtnLink = document.getElementById("tab-btn-link");
+const tabBtnManual = document.getElementById("tab-btn-manual");
+const panelLinkContent = document.getElementById("panel-link-content");
+const panelManualContent = document.getElementById("panel-manual-content");
+
+if (tabBtnLink && tabBtnManual) {
+    tabBtnLink.addEventListener("click", () => {
+        tabBtnLink.classList.add("active");
+        tabBtnLink.style.background = "rgba(255,255,255,0.05)";
+        tabBtnLink.style.borderColor = "rgba(255,255,255,0.1)";
+        tabBtnLink.style.color = "#fff";
+        
+        tabBtnManual.classList.remove("active");
+        tabBtnManual.style.background = "transparent";
+        tabBtnManual.style.borderColor = "transparent";
+        tabBtnManual.style.color = "rgba(255,255,255,0.5)";
+        
+        panelLinkContent.style.display = "block";
+        panelManualContent.style.display = "none";
+    });
+
+    tabBtnManual.addEventListener("click", () => {
+        tabBtnManual.classList.add("active");
+        tabBtnManual.style.background = "rgba(255,255,255,0.05)";
+        tabBtnManual.style.borderColor = "rgba(255,255,255,0.1)";
+        tabBtnManual.style.color = "#fff";
+        
+        tabBtnLink.classList.remove("active");
+        tabBtnLink.style.background = "transparent";
+        tabBtnLink.style.borderColor = "transparent";
+        tabBtnLink.style.color = "rgba(255,255,255,0.5)";
+        
+        panelManualContent.style.display = "block";
+        panelLinkContent.style.display = "none";
+        
+        selectedScrapedImageUrl = null;
+    });
+}
+
+const btnParseLink = document.getElementById("btn-parse-link");
+const productLinkInput = document.getElementById("product-link-input");
+const scrapedImagesContainer = document.getElementById("scraped-images-container");
+const scrapedImagesCarousel = document.getElementById("scraped-images-carousel");
+
+if (btnParseLink) {
+    btnParseLink.addEventListener("click", async () => {
+        const url = productLinkInput.value.trim();
+        if (!url) {
+            alert(activeLang === "tr" ? "Lütfen geçerli bir e-ticaret ürün linki girin." : "Please enter a valid e-commerce product link.");
+            return;
+        }
+
+        const originalHtml = btnParseLink.innerHTML;
+        btnParseLink.disabled = true;
+        btnParseLink.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${activeLang === "tr" ? "Çözülüyor..." : "Parsing..."}`;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/parse-link`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: url })
+            });
+
+            if (!res.ok) throw new Error("Parse failed");
+            const data = await res.json();
+
+            if (data.status === "success") {
+                productTitle.value = data.title || "";
+                productPrice.value = data.price || "";
+                productDesc.value = data.description || "";
+
+                if (data.images && data.images.length > 0) {
+                    scrapedImagesCarousel.innerHTML = "";
+                    
+                    data.images.forEach((imgUrl, idx) => {
+                        const card = document.createElement("div");
+                        card.className = "scraped-img-card" + (idx === 0 ? " active" : "");
+                        card.style.cssText = "width: 75px; height: 75px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid " + (idx === 0 ? "#ff9f0a" : "transparent") + "; position: relative; transition: all 0.2s; flex-shrink: 0; background: #0f172a;";
+                        card.innerHTML = `<img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        
+                        card.addEventListener("click", () => {
+                            document.querySelectorAll(".scraped-img-card").forEach(c => {
+                                c.classList.remove("active");
+                                c.style.borderColor = "transparent";
+                            });
+                            card.classList.add("active");
+                            card.style.borderColor = "#ff9f0a";
+                            
+                            selectedScrapedImageUrl = imgUrl;
+                            selectedProductTemplate = null;
+                            productImageInput.value = "";
+                            productUploadPreview.classList.add("hidden");
+                            productTemplates.forEach(t => t.classList.remove("active"));
+                        });
+
+                        scrapedImagesCarousel.appendChild(card);
+                    });
+
+                    selectedScrapedImageUrl = data.images[0];
+                    selectedProductTemplate = null;
+                    productTemplates.forEach(t => t.classList.remove("active"));
+
+                    scrapedImagesContainer.classList.remove("hidden");
+                    scrapedImagesContainer.style.opacity = 0;
+                    setTimeout(() => scrapedImagesContainer.style.opacity = 1, 50);
+                }
+            } else {
+                throw new Error(data.detail || "Unknown error");
+            }
+        } catch (err) {
+            console.error("Link parsing failed:", err);
+            alert(activeLang === "tr" 
+                ? "Link çözümlenemedi. Lütfen internetinizi kontrol edin veya manuel yükleme yapın." 
+                : "Failed to parse product link. Please check connection or use manual upload.");
+        } finally {
+            btnParseLink.disabled = false;
+            btnParseLink.innerHTML = originalHtml;
+        }
+    });
+}
+
 // Dynamic Star Rating Interactive Control
 function updateInteractiveRating(val) {
     const ratingInput = document.getElementById("product-rating");
@@ -779,6 +914,8 @@ productImageInput.addEventListener("change", () => {
             
             productTemplates.forEach(c => c.classList.remove("active"));
             selectedProductTemplate = null;
+            selectedScrapedImageUrl = null;
+            if (scrapedImagesContainer) scrapedImagesContainer.classList.add("hidden");
         };
         reader.readAsDataURL(file);
     }
@@ -795,6 +932,8 @@ btnRemoveProductImg.addEventListener("click", (e) => {
     e.stopPropagation();
     productImageInput.value = "";
     productUploadPreview.classList.add("hidden");
+    selectedScrapedImageUrl = null;
+    if (scrapedImagesContainer) scrapedImagesContainer.classList.add("hidden");
     productTemplates[0].click();
 });
 
@@ -807,7 +946,7 @@ btnSubmitTryon.addEventListener("click", async () => {
         return;
     }
     
-    if (!selectedProductTemplate && !productImageInput.files[0]) {
+    if (!selectedProductTemplate && !productImageInput.files[0] && !selectedScrapedImageUrl) {
         alert(activeLang === "tr" ? "Lütfen denenecek kıyafeti belirleyin." : "Please choose the garment to try on.");
         return;
     }
@@ -868,7 +1007,11 @@ btnSubmitTryon.addEventListener("click", async () => {
             imgCompareBefore.src = `assets/${selectedUserTemplate}`;
         }
         
-        if (productImageInput.files[0]) {
+        if (selectedScrapedImageUrl) {
+            const response = await fetch(selectedScrapedImageUrl);
+            const blob = await response.blob();
+            formData.append("product_image", new File([blob], "scraped_garment.jpg", { type: "image/jpeg" }));
+        } else if (productImageInput.files[0]) {
             formData.append("product_image", productImageInput.files[0]);
         } else {
             const response = await fetch(`assets/${selectedProductTemplate}`);

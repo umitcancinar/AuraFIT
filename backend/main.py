@@ -90,6 +90,15 @@ except Exception as _import_err:
     logger.error(f"⚠️ vton_service import failed: {_import_err}")
     async def run_vton(*args, **kwargs): return (kwargs.get('user_image_path', ''), 'Motor Kullanılamıyor (Import Hatası)')
 
+try:
+    from services.scraper_service import scrape_product_link
+    logger.info("✅ scraper_service imported successfully")
+except Exception as _import_err:
+    logger.error(f"⚠️ scraper_service import failed: {_import_err}")
+    async def scrape_product_link(url: str):
+        from services.scraper_service import DEFAULT_MOCK
+        return DEFAULT_MOCK
+
 from services.db_service import (
     get_db, init_db, hash_password, verify_password, 
     create_access_token, decode_access_token, User, TryOn
@@ -554,4 +563,26 @@ async def chat_endpoint(req: ChatRequest):
     except Exception as e:
         logger.error(f"Error in chat_endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/parse-link")
+async def parse_link(req: LinkRequest):
+    """
+    Intelligent product link scraper endpoint.
+    Extracts high-resolution images, price, title, and description.
+    """
+    if not req.url or not req.url.strip():
+        raise HTTPException(status_code=400, detail="URL cannot be empty")
+    try:
+        data = await scrape_product_link(req.url)
+        return {
+            "status": "success",
+            "title": data.get("title", ""),
+            "price": data.get("price", 0.0),
+            "description": data.get("description", ""),
+            "images": data.get("images", []),
+            "source": data.get("source", "Scraper")
+        }
+    except Exception as e:
+        logger.error(f"Error in parse_link: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Link çözümlenirken bir hata oluştu: {str(e)}")
 

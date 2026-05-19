@@ -2771,3 +2771,38 @@ body.light-theme .apple-btn-primary:hover {
     text-align: center;
 }
 
+/* Premium Product Scraper Transitions & Image Cards */
+.prod-tab-btn:hover {
+    color: #fff !important;
+    background: rgba(255,255,255,0.03) !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+.prod-tab-btn.active:hover {
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(255,255,255,0.12) !important;
+}
+.scraped-img-card:hover {
+    transform: scale(1.06);
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.scraped-img-card.active:hover {
+    transform: scale(1.06);
+    border-color: #ff9f0a !important;
+    box-shadow: 0 4px 12px rgba(255, 159, 10, 0.25);
+}
+.scraped-images-carousel::-webkit-scrollbar {
+    height: 5px;
+}
+.scraped-images-carousel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+}
+.scraped-images-carousel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+.scraped-images-carousel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
