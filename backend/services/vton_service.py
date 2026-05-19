@@ -165,25 +165,47 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
             # We run this in an executor to avoid blocking the FastAPI event loop
             loop = asyncio.get_event_loop()
             
-            # Use yisol/IDM-VTON Space client for the absolute highest quality photorealistic results
+            # Use verified active jallenjia/Change-Clothes-AI Space client
             def call_gradio():
-                client = Client("tonyassi/fashion-try-on")
+                client = Client("jallenjia/Change-Clothes-AI")
+                
+                # Auto-detect category based on prompt or file tags
+                prompt_lower = (prompt or "").lower()
+                category = "upper_body"
+                if any(x in prompt_lower for x in ["dress", "elbise", "tulum", "skirt", "etek"]):
+                    category = "dresses"
+                elif any(x in prompt_lower for x in ["pant", "pantolon", "jean", "şort", "short", "trouser"]):
+                    category = "lower_body"
                 
                 # Predict
                 result = client.predict(
-                    person=handle_file(user_image_path),
-                    clothing=handle_file(product_image_path),
-                    api_name="/generate"
+                    dict={
+                        "background": handle_file(user_image_path),
+                        "layers": [],
+                        "composite": None
+                    },
+                    garm_img=handle_file(product_image_path),
+                    garment_des=prompt or "kıyafet",
+                    is_checked=True,
+                    is_checked_crop=False,
+                    denoise_steps=30,
+                    seed=42,
+                    category=category,
+                    api_name="/tryon"
                 )
-                # The result is typically a list of file paths/details, return the first item which is the image path
                 if isinstance(result, tuple) or isinstance(result, list):
-                    return result[0]
+                    res_img = result[0]
+                    if isinstance(res_img, dict) and "path" in res_img:
+                        return res_img["path"]
+                    return res_img
+                elif isinstance(result, dict) and "path" in result:
+                    return result["path"]
                 return result
 
-            # Run with a 35 second timeout
+            # Run with a 55 second timeout
             result_path = await asyncio.wait_for(
                 loop.run_in_executor(None, call_gradio),
-                timeout=35.0
+                timeout=55.0
             )
             
             if result_path and os.path.exists(result_path):
