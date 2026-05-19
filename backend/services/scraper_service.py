@@ -130,6 +130,29 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         images = []
         reviews = []
         
+        # --- SEO JUNK PATTERNS TO STRIP ---
+        seo_title_suffixes = [
+            r'\s*-\s*Fiyat[ıi],?\s*Yorum(?:lar[ıi])?.*$',
+            r'\s*-\s*Trendyol.*$',
+            r'\s*\|\s*Trendyol.*$',
+            r'\s*-\s*Hepsiburada.*$',
+            r'\s*\|\s*H&M.*$',
+            r'\s*-\s*LCW.*$',
+            r'\s*-\s*Amazon.*$',
+            r'\s*yorumlar[ıi]n[ıi]\s+inceleyin.*$',
+        ]
+        seo_desc_patterns = [
+            r'yorumlar[ıi]n[ıi]\s+inceleyin.*$',
+            r"Trendyol'a özel.*$",
+            r'indirimli fiyata.*$',
+            r'\s*-\s*Trendyol\s*$',
+        ]
+        
+        def clean_seo_text(text, patterns):
+            for pattern in patterns:
+                text = re.sub(pattern, '', text, flags=re.IGNORECASE).strip()
+            return text
+        
         # 1. Parse Title
         og_title = soup.find("meta", property="og:title")
         if og_title and og_title.get("content"):
@@ -138,11 +161,24 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
             title_tag = soup.find("title")
             if title_tag:
                 title = title_tag.text.strip()
+        
+        # Clean SEO junk from title
+        title = clean_seo_text(title, seo_title_suffixes)
                 
         # 2. Parse Description
         og_desc = soup.find("meta", property="og:description")
         if og_desc and og_desc.get("content"):
             description = og_desc.get("content").strip()
+        
+        # Clean SEO junk from description
+        description = clean_seo_text(description, seo_desc_patterns)
+        
+        # If description is too short or generic after cleaning, try to find a better one
+        if len(description) < 20:
+            # Try finding product detail text in the page
+            detail_el = soup.find("div", class_="detail-desc-text") or soup.find("div", class_="product-description")
+            if detail_el:
+                description = detail_el.get_text(strip=True)[:500]
             
         # 3. Parse Price
         og_price = soup.find("meta", property="product:price:amount") or soup.find("meta", property="og:price:amount")
@@ -230,6 +266,48 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
                         
         # Ensure we filter out tiny or invalid URLs and cap at 5 premium images
         images = [img for img in images if len(img) > 10][:5]
+        
+        # --- TRENDYOL-SPECIFIC REVIEW API ---
+        # Trendyol loads reviews via JS, not in static HTML. We call their public API directly.
+        if not reviews and "trendyol.com" in url_lower:
+            try:
+                # Extract product contentId from URL pattern: -p-{contentId}
+                content_id_match = re.search(r'-p-(\d+)', url)
+                if content_id_match:
+                    content_id = content_id_match.group(1)
+                    review_api_url = f"https://public-mdc.trendyol.com/discovery-web-socialgw-service/api/review/{content_id}?page=0&order=DESC&orderByField=LastModifiedDate"
+                    
+                    async with httpx.AsyncClient(timeout=5.0) as review_client:
+                        review_resp = await review_client.get(review_api_url, headers={
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                            "Accept": "application/json",
+                        })
+                    
+                    if review_resp.status_code == 200:
+                        review_data = review_resp.json()
+                        review_list = review_data.get("result", {}).get("productReviews", [])
+                        
+                        for rv in review_list[:8]:  # Cap at 8 reviews
+                            user_name = rv.get("userFullName", "Alıcı")
+                            # Mask surname for privacy: "Ahmet K."
+                            name_parts = user_name.split()
+                            if len(name_parts) >= 2:
+                                user_name = f"{name_parts[0]} {name_parts[1][0]}."
+                            
+                            comment_text = rv.get("comment", "")
+                            star_rating = rv.get("rate", 5)
+                            
+                            if comment_text and len(comment_text.strip()) > 5:
+                                reviews.append({
+                                    "user": user_name,
+                                    "rating": int(star_rating),
+                                    "comment": comment_text.strip()[:200]
+                                })
+                        
+                        if reviews:
+                            logger.info(f"✅ Fetched {len(reviews)} real Trendyol reviews via API for contentId {content_id}")
+            except Exception as rev_err:
+                logger.warning(f"Trendyol review API fetch failed: {rev_err}")
         
         # If no reviews parsed from dynamic page, leave empty — do NOT inject fake reviews
         # Real reviews will only appear if the e-commerce site exposes them in JSON-LD schema
