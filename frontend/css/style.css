@@ -2619,3 +2619,155 @@ body.light-theme .apple-btn-primary:hover {
     opacity: 0.7;
 }
 
+/* ====================================================
+   UPCOMING / COMING SOON PREMIUM STYLES
+   ==================================================== */
+/* Pulse Animation for Coming Soon Badge */
+@keyframes coming-soon-pulse {
+    0% { transform: scale(1); opacity: 0.95; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 15px 4px rgba(245, 158, 11, 0.7); }
+    100% { transform: scale(1); opacity: 0.95; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+@keyframes dot-blink {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 10px #f59e0b; }
+}
+
+/* Landing Page Feature Card Extension */
+.feat-coming-soon {
+    position: relative;
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
+    background: linear-gradient(135deg, rgba(20, 20, 25, 0.6) 0%, rgba(35, 30, 20, 0.4) 100%) !important;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.feat-coming-soon:hover {
+    border-color: rgba(245, 158, 11, 0.5) !important;
+    box-shadow: 0 20px 40px rgba(245, 158, 11, 0.1) !important;
+}
+
+.coming-soon-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #0f0f15;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    font-family: 'Outfit', sans-serif;
+    animation: coming-soon-pulse 2.5s infinite ease-in-out;
+}
+
+.bg-gold {
+    background: linear-gradient(135deg, #f59e0b 0%, #ffc007 100%) !important;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3) !important;
+}
+
+.bg-gold i {
+    color: #0f0f15 !important;
+}
+
+.upcoming-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upcoming-features-list li {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.3s;
+}
+
+.upcoming-features-list li i {
+    color: #f59e0b;
+    font-size: 0.9rem;
+}
+
+.feat-coming-soon:hover .upcoming-features-list li {
+    color: var(--text-primary);
+}
+
+/* Dashboard Input Panel Widget */
+.coming-soon-widget {
+    margin-top: 25px;
+    background: rgba(245, 158, 11, 0.03);
+    border: 1px dashed rgba(245, 158, 11, 0.25);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
+
+.coming-soon-widget:hover {
+    background: rgba(245, 158, 11, 0.05);
+    border-style: solid;
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.coming-soon-widget .widget-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.coming-soon-widget .pulsing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #f59e0b;
+    animation: dot-blink 2s infinite ease-in-out;
+}
+
+.coming-soon-widget h4 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f59e0b;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.coming-soon-widget .widget-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.coming-soon-widget .widget-list li {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.65);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.4;
+}
+
+.coming-soon-widget .widget-list li i {
+    color: rgba(245, 158, 11, 0.7);
+    font-size: 0.85rem;
+    width: 16px;
+    text-align: center;
+}
+
