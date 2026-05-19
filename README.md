@@ -1,5 +1,7 @@
 # 🌟 AuraFIT: Geleceğin Yapay Zeka Destekli Akıllı E-Ticaret Kabini
 
+🌐 Canlı Site Linki: https://aura-fit-gold.vercel.app/
+
 AuraFIT, kullanıcıların e-ticaret sitelerinde beğendikleri kıyafetleri kendi üzerlerinde sanal olarak deneyebildikleri, **Google Gemini 3 Flash** modeliyle akıllı finansal (Cost-per-Wear) ve stilist danışmanlık hizmeti sunan devrim niteliğinde bir platformdur. Apple şıklığında tasarlanmış büyüleyici arayüzü sayesinde kusursuz bir kullanıcı deneyimi sunar.
 ---
 
