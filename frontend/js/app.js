@@ -471,16 +471,16 @@ function logoutUser() {
     authToken = null;
     currentUser = null;
     
-    // Reset inputs
-    productTitle.value = "";
-    productPrice.value = "";
-    productDesc.value = "";
-    productUrl.value = "";
+    // Reset inputs safely with null-checks to prevent ReferenceErrors
+    if (productTitle) productTitle.value = "";
+    if (productPrice) productPrice.value = "";
+    if (productDesc) productDesc.value = "";
+    if (productExtraNotes) productExtraNotes.value = "";
     
     // Restore states
-    stateSuccess.classList.add("hidden");
-    stateLoading.classList.add("hidden");
-    stateEmpty.classList.add("hidden");
+    if (stateSuccess) stateSuccess.classList.add("hidden");
+    if (stateLoading) stateLoading.classList.add("hidden");
+    if (stateEmpty) stateEmpty.classList.add("hidden");
     
     setGuestUIState();
 }
