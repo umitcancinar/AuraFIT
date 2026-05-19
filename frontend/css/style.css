@@ -2806,3 +2806,23 @@ body.light-theme .apple-btn-primary:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
+/* Premium Glow Action Button */
+.premium-btn-glow {
+    box-shadow: 0 4px 15px rgba(0, 113, 227, 0.35);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+.premium-btn-glow:hover:not(:disabled) {
+    transform: translateY(-1.5px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(0, 113, 227, 0.5);
+    filter: brightness(1.1);
+}
+.premium-btn-glow:active:not(:disabled) {
+    transform: translateY(0.5px) scale(0.98);
+}
+.premium-btn-glow:disabled {
+    background: rgba(255,255,255,0.06) !important;
+    color: rgba(255,255,255,0.3) !important;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
