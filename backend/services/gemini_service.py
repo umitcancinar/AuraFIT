@@ -102,9 +102,14 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
     try:
         model = genai.GenerativeModel(get_model_name())
         
-        # Load images for Gemini using PIL
-        user_img = Image.open(io.BytesIO(user_image_bytes))
-        product_img = Image.open(io.BytesIO(product_image_bytes))
+        def get_mime_type(b):
+            if b.startswith(b'\x89PNG'): return 'image/png'
+            if b.startswith(b'RIFF') and b'WEBP' in b[8:12]: return 'image/webp'
+            return 'image/jpeg'
+            
+        # Use raw blobs to prevent PIL serialization errors in the async SDK
+        user_img = {"mime_type": get_mime_type(user_image_bytes), "data": user_image_bytes} if user_image_bytes else None
+        product_img = {"mime_type": get_mime_type(product_image_bytes), "data": product_image_bytes} if product_image_bytes else None
         note_instruction = f"User's Extra Context/Note: {extra_note}" if extra_note else ""
         
         # Add reviews input to the prompt
