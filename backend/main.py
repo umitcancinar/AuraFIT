@@ -428,7 +428,14 @@ async def try_on(
         )
         
         # Gather results
-        result_image_path, styling_report = await asyncio.gather(vton_task, report_task)
+        vton_result, styling_report = await asyncio.gather(vton_task, report_task)
+        
+        # Unpack VTON result tuple (path, engine_name)
+        if isinstance(vton_result, tuple):
+            result_image_path, vton_engine = vton_result
+        else:
+            result_image_path = vton_result
+            vton_engine = "Bilinmeyen Motor"
         
         # Override the quality_rating if the user explicitly provided a rating
         if rating and 1 <= rating <= 5:
@@ -501,7 +508,8 @@ async def try_on(
             "status": "success",
             "image_url": image_url,
             "optimized_prompt": optimized_prompt,
-            "styling_report": styling_report
+            "styling_report": styling_report,
+            "vton_engine": vton_engine
         }
         
     except Exception as e:

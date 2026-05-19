@@ -889,6 +889,18 @@ btnSubmitTryon.addEventListener("click", async () => {
             currentProductPrice = pPrice;
             renderReports(data.styling_report, pPrice);
             
+            // Show engine info badge
+            const engineBadge = document.getElementById("vton-engine-badge");
+            const engineName = document.getElementById("vton-engine-name");
+            if (engineBadge && engineName && data.vton_engine) {
+                engineName.textContent = data.vton_engine;
+                engineBadge.style.display = "flex";
+            }
+            
+            // Show experimental toolbar
+            const expToolbar = document.getElementById("experimental-toolbar");
+            if (expToolbar) expToolbar.style.display = "block";
+            
             stateLoading.classList.add("hidden");
             stateSuccess.classList.remove("hidden");
             

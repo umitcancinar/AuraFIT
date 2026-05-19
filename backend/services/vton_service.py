@@ -35,7 +35,7 @@ import requests
 
 CUSTOM_VTON_API_URL = os.getenv("CUSTOM_VTON_API_URL", "").strip()
 
-async def run_vton(user_image_path: str, product_image_path: str, prompt: str, user_filename: str = None, product_filename: str = None) -> str:
+async def run_vton(user_image_path: str, product_image_path: str, prompt: str, user_filename: str = None, product_filename: str = None) -> tuple:
     """
     Asynchronously runs the Virtual Try-On.
     Attempts to call Hugging Face Space yisol/IDM-VTON via gradio_client.
@@ -43,7 +43,7 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
     If the API call fails or times out, falls back to an intelligent local image blending solution.
     
     Returns:
-        str: Path to the generated or blended result image.
+        tuple: (path_to_result_image: str, engine_name: str)
     """
     user_filename = user_filename or os.path.basename(user_image_path)
     product_filename = product_filename or os.path.basename(product_image_path)
@@ -68,7 +68,7 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
                 logger.info(f"Hackathon Template Shortcut Match! Returning pre-rendered asset: {p}")
                 # Wait 1.5 seconds to simulate AI thinking for authentic feel
                 await asyncio.sleep(1.5)
-                return os.path.abspath(p)
+                return (os.path.abspath(p), "IDM-VTON (Pre-rendered GPU Result)")
 
     # 1.5 DEDICATED CUSTOM COLAB GPU API CALLER
     if CUSTOM_VTON_API_URL:
@@ -100,68 +100,81 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
             result_path = await loop.run_in_executor(None, call_custom_api)
             if result_path and os.path.exists(result_path):
                 logger.info(f"Dedicated Custom VTON API completed successfully. Result path: {result_path}")
-                return result_path
+                return (result_path, "IDM-VTON (Google Colab T4 GPU)")
         except Exception as custom_err:
             logger.error(f"Dedicated Custom VTON API failed ({str(custom_err)}). Trying public/local fallbacks...")
                 
     # 2. LIVE HUGGING FACE API CALL
-    try:
-        logger.info("Attempting live Hugging Face IDM-VTON API connection...")
-        # We run this in an executor to avoid blocking the FastAPI event loop
-        loop = asyncio.get_event_loop()
-        
-        # Use yisol/IDM-VTON Space client for the absolute highest quality photorealistic results
-        def call_gradio():
-            client = Client("yisol/IDM-VTON")
-            
-            # Predict
-            result = client.predict(
-                dict={
-                    "background": handle_file(user_image_path),
-                    "layers": [],
-                    "composite": None
-                },
-                garm_img=handle_file(product_image_path),
-                garment_des=prompt,
-                is_checked=True,
-                is_checked_crop=False,
-                denoise_steps=30,
-                seed=42,
-                api_name="/tryon"
-            )
-            # The result is typically a list of file paths/details, return the first item which is the image path
-            if isinstance(result, tuple) or isinstance(result, list):
-                return result[0]
-            return result
-
-        # Run with a 35 second timeout
-        result_path = await asyncio.wait_for(
-            loop.run_in_executor(None, call_gradio),
-            timeout=35.0
-        )
-        
-        if result_path and os.path.exists(result_path):
-            logger.info(f"Live HF IDM-VTON completed successfully. Result path: {result_path}")
-            return result_path
-        else:
-            raise Exception("Invalid or empty result from HF Space API.")
-            
-    except Exception as e:
-        logger.warning(f"HF VTON failed or timed out ({str(e)}). Switching to intelligent local fallback blending...")
-        
-        # 3. INTELLIGENT LOCAL BLENDING FALLBACK
-        # Blends the garment and user photo using Pillow to ensure the app never crashes
+    if _GRADIO_AVAILABLE and Client is not None:
         try:
-            return await generate_blended_fallback(user_image_path, product_image_path)
-        except Exception as blend_err:
-            logger.error(f"Failed to generate blended fallback: {str(blend_err)}")
-            # Ultimate safety return the original user image
-            return user_image_path
+            logger.info("Attempting live Hugging Face IDM-VTON API connection...")
+            # We run this in an executor to avoid blocking the FastAPI event loop
+            loop = asyncio.get_event_loop()
+            
+            # Use yisol/IDM-VTON Space client for the absolute highest quality photorealistic results
+            def call_gradio():
+                client = Client("yisol/IDM-VTON")
+                
+                # Predict
+                result = client.predict(
+                    dict={
+                        "background": handle_file(user_image_path),
+                        "layers": [],
+                        "composite": None
+                    },
+                    garm_img=handle_file(product_image_path),
+                    garment_des=prompt,
+                    is_checked=True,
+                    is_checked_crop=False,
+                    denoise_steps=30,
+                    seed=42,
+                    api_name="/tryon"
+                )
+                # The result is typically a list of file paths/details, return the first item which is the image path
+                if isinstance(result, tuple) or isinstance(result, list):
+                    return result[0]
+                return result
 
-async def generate_blended_fallback(user_image_path: str, product_image_path: str) -> str:
+            # Run with a 35 second timeout
+            result_path = await asyncio.wait_for(
+                loop.run_in_executor(None, call_gradio),
+                timeout=35.0
+            )
+            
+            if result_path and os.path.exists(result_path):
+                logger.info(f"Live HF IDM-VTON completed successfully. Result path: {result_path}")
+                return (result_path, "IDM-VTON (Hugging Face Cloud GPU)")
+            else:
+                raise Exception("Invalid or empty result from HF Space API.")
+                
+        except Exception as e:
+            logger.warning(f"HF VTON failed or timed out ({str(e)}). Switching to intelligent local fallback blending...")
+    else:
+        logger.warning("gradio_client not available, skipping HF API. Going to local fallback blending...")
+    
+    # 3. INTELLIGENT LOCAL BLENDING FALLBACK
+    # Blends the garment and user photo using Pillow to ensure the app never crashes
+    if _PIL_AVAILABLE:
+        try:
+            result_path = await generate_blended_fallback(user_image_path, product_image_path, prompt)
+            logger.info(f"Local blending fallback completed successfully. Result path: {result_path}")
+            return (result_path, "AuraFit Akıllı Görüntü Birleştirme (Yerel Motor)")
+        except Exception as blend_err:
+            logger.error(f"Failed to generate blended fallback: {str(blend_err)}", exc_info=True)
+    
+    # 4. ULTIMATE SAFETY: return original user image
+    logger.error("ALL VTON engines failed. Returning original user image as last resort.")
+    return (user_image_path, "Yedek Sistem (Motor Hatası)")
+
+async def generate_blended_fallback(user_image_path: str, product_image_path: str, prompt: str = "") -> str:
     """
     Creates an intelligent, context-aware blended preview by sizing and placing 
     the keyed product image over the correct body region (eyes, chest, or feet).
+    
+    Args:
+        user_image_path: Path to user's photo
+        product_image_path: Path to product/garment photo
+        prompt: The optimized VTON prompt text for semantic category detection
     """
     loop = asyncio.get_event_loop()
     
@@ -198,7 +211,7 @@ async def generate_blended_fallback(user_image_path: str, product_image_path: st
         u_width, u_height = user_img.size
         
         # Combine filename and optimized prompt to prevent generic uploads (like 1.png) from misclassifying
-        search_string = (filename_lower + " " + prompt.lower()).strip()
+        search_string = (filename_lower + " " + (prompt or "").lower()).strip()
         
         # Context-aware dimensions and placement
         if any(x in search_string for x in ["sunglasses", "glasses", "gozluk", "gözlük", "glass", "eyewear", "spectacles"]):
@@ -255,6 +268,7 @@ async def generate_blended_fallback(user_image_path: str, product_image_path: st
         
         out_path = os.path.join(out_dir, f"vton_fallback_{int(time.time())}.png")
         composite.convert("RGB").save(out_path, "JPEG", quality=95)
+        logger.info(f"Blended fallback image saved to: {out_path}")
         return out_path
         
     return await loop.run_in_executor(None, process_images)

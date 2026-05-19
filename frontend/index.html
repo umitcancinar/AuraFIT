@@ -398,6 +398,36 @@
                         </div>
                     </div>
 
+                    <!-- Engine Info Badge -->
+                    <div id="vton-engine-badge" style="display: none; margin: 10px 0 6px; padding: 10px 16px; border-radius: 10px; background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(59,130,246,0.08)); border: 1px solid rgba(16,185,129,0.25); font-family: 'Outfit', sans-serif; font-size: 0.82rem; color: rgba(255,255,255,0.85); align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-microchip" style="color: #10b981; font-size: 0.95rem;"></i>
+                        <span>Motor: <strong id="vton-engine-name" style="color: #10b981;">—</strong></span>
+                    </div>
+
+                    <!-- Experimental Future Features Toolbar -->
+                    <div id="experimental-toolbar" style="display: none; margin: 8px 0 14px; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                            <span style="font-family: 'Outfit', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fa-solid fa-flask"></i> Deneysel Özellikler
+                            </span>
+                            <span style="font-size: 0.65rem; padding: 2px 8px; border-radius: 6px; background: rgba(245,158,11,0.15); color: #f59e0b; font-weight: 600; letter-spacing: 0.5px;">GELİŞTİRME AŞAMASINDA</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <button type="button" class="btn-experimental" onclick="alert('Bu özellik geliştirme aşamasındadır. Yakında aktif olacaktır!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fa-solid fa-link" style="color: #6366f1;"></i> Ürün Linkinden Analiz
+                            </button>
+                            <button type="button" class="btn-experimental" onclick="alert('E-ticaret platform entegrasyonu geliştirme aşamasındadır. Yakında aktif olacaktır!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fa-solid fa-cart-shopping" style="color: #ec4899;"></i> E-Ticaret Platformuna Bağla
+                            </button>
+                            <button type="button" class="btn-experimental" onclick="alert('Paylaşım ve sosyal medya entegrasyonu geliştirme aşamasındadır!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fa-solid fa-share-nodes" style="color: #22d3ee;"></i> Sonucu Paylaş
+                            </button>
+                            <button type="button" class="btn-experimental" onclick="alert('Gardrobe AI özelliği geliştirme aşamasındadır. Yakında gardırobunuzu analiz edebileceksiniz!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> Gardrop AI Analizi
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="reports-grid">
                         <!-- Card A: Size Fit -->
                         <div class="report-card card-glass fit-card">
