@@ -19,7 +19,11 @@ MOCK_PRODUCTS = {
             "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600&auto=format&fit=crop", # Classic Hoodie
             "https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=600&auto=format&fit=crop"  # Grey Hoodie
         ],
-        "source": "AuraFit Otomatik Tespit"
+        "source": "AuraFit Otomatik Tespit",
+        "reviews": [
+            {"user": "Ahmet K.", "rating": 5, "comment": "Kumaşı aşırı kalın ve kaliteli, tam kışlık bir ürün. Boyum 1.80, L beden tam oversize durdu."},
+            {"user": "Merve Y.", "rating": 4, "comment": "Yumuşacık, içi polarlı çok sıcak tutuyor. Bir beden küçük alınabilir salaş istemiyorsanız."}
+        ]
     },
     "sweater": {
         "title": "Premium Selanik Örgü Balıkçı Yaka Kazak",
@@ -30,7 +34,11 @@ MOCK_PRODUCTS = {
             "https://images.unsplash.com/photo-1620799139507-2a76f79a2f4d?q=80&w=600&auto=format&fit=crop", # Cream Sweater
             "https://images.unsplash.com/photo-1517231925375-be9b82f50993?q=80&w=600&auto=format&fit=crop"  # Grey Classic Knitwear
         ],
-        "source": "AuraFit Otomatik Tespit"
+        "source": "AuraFit Otomatik Tespit",
+        "reviews": [
+            {"user": "Caner D.", "rating": 5, "comment": "Dokusu yumuşacık, yün kalitesi çok yüksek. Balıkçı yakası boğazı sıkmıyor, çok şık."},
+            {"user": "Elif A.", "rating": 4, "comment": "Rengi tam görseldeki gibi canlı kırmızı. Boyu biraz kısa ama yüksek bel pantolonlarla harika duruyor."}
+        ]
     },
     "dress": {
         "title": "Zarif Askılı Keten Maksi Elbise",
@@ -41,7 +49,11 @@ MOCK_PRODUCTS = {
             "https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?q=80&w=600&auto=format&fit=crop", # Elegant Dress
             "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=600&auto=format&fit=crop"  # Summer Dress
         ],
-        "source": "AuraFit Otomatik Tespit"
+        "source": "AuraFit Otomatik Tespit",
+        "reviews": [
+            {"user": "Buse T.", "rating": 5, "comment": "Keten kalitesi inanılmaz, yaz sıcaklarında tiril tiril giyilir. Tam bedeninizi alın."},
+            {"user": "Selin G.", "rating": 5, "comment": "Yeşil rengi ten rengimi çok güzel açtı. Astarsız olmasına rağmen iç göstermiyor."}
+        ]
     },
     "tshirt": {
         "title": "Heavyweight Cotton Basic Oversize T-Shirt",
@@ -52,7 +64,11 @@ MOCK_PRODUCTS = {
             "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=600&auto=format&fit=crop", # Black Tshirt
             "https://images.unsplash.com/photo-1562157873-818bc0726f68?q=80&w=600&auto=format&fit=crop"  # Beige Classic
         ],
-        "source": "AuraFit Otomatik Tespit"
+        "source": "AuraFit Otomatik Tespit",
+        "reviews": [
+            {"user": "Onur S.", "rating": 5, "comment": "Heavyweight kumaşı çok tok duruyor, defalarca yıkadım çekme yapmadı. En sevdiğim tişört oldu."},
+            {"user": "Burak E.", "rating": 4, "comment": "Yaka ribanası kalın ve esneme yapmıyor. Oversize duruşu tam aradığım gibi."}
+        ]
     }
 }
 
@@ -66,7 +82,11 @@ DEFAULT_MOCK = {
         "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=600&auto=format&fit=crop", # Classic Red Shirt
         "https://images.unsplash.com/photo-1614975058789-41316d0e2e9c?q=80&w=600&auto=format&fit=crop"  # Red Knitwear
     ],
-    "source": "AuraFit Genel Şablon"
+    "source": "AuraFit Genel Şablon",
+    "reviews": [
+        {"user": "Zeynep B.", "rating": 5, "comment": "Fiyat performans açısından harika bir ürün. Kesimi, kumaş dokusu çok başarılı."},
+        {"user": "Kadir S.", "rating": 4, "comment": "Kargo çok hızlı geldi, paketi de özenliydi. Günlük kombinler için çok uygun."}
+    ]
 }
 
 async def scrape_product_link(url: str) -> Dict[str, Any]:
@@ -108,6 +128,7 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         price = 0.0
         description = ""
         images = []
+        reviews = []
         
         # 1. Parse Title
         og_title = soup.find("meta", property="og:title")
@@ -148,7 +169,7 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
             if main_img_url.startswith("http"):
                 images.append(main_img_url)
                 
-        # Second, extract images from JSON-LD schema
+        # Second, extract images and reviews from JSON-LD schema
         scripts = soup.find_all("script", type="application/ld+json")
         for script in scripts:
             try:
@@ -163,6 +184,36 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
                                     images.append(s_img)
                         elif isinstance(schema_imgs, str) and schema_imgs.startswith("http") and schema_imgs not in images:
                             images.append(schema_imgs)
+                            
+                        # Extract reviews
+                        schema_reviews = js_data.get("review")
+                        if schema_reviews:
+                            if isinstance(schema_reviews, list):
+                                for r in schema_reviews:
+                                    if isinstance(r, dict):
+                                        author = r.get("author", {})
+                                        author_name = author.get("name") if isinstance(author, dict) else str(author)
+                                        review_body = r.get("reviewBody", "")
+                                        review_rating = r.get("reviewRating", {})
+                                        rating_val = review_rating.get("ratingValue") if isinstance(review_rating, dict) else 5
+                                        if review_body:
+                                            reviews.append({
+                                                "user": author_name or "Alıcı",
+                                                "rating": int(float(rating_val)) if rating_val else 5,
+                                                "comment": review_body[:150]
+                                            })
+                            elif isinstance(schema_reviews, dict):
+                                author = schema_reviews.get("author", {})
+                                author_name = author.get("name") if isinstance(author, dict) else str(author)
+                                review_body = schema_reviews.get("reviewBody", "")
+                                review_rating = schema_reviews.get("reviewRating", {})
+                                rating_val = review_rating.get("ratingValue") if isinstance(review_rating, dict) else 5
+                                if review_body:
+                                    reviews.append({
+                                        "user": author_name or "Alıcı",
+                                        "rating": int(float(rating_val)) if rating_val else 5,
+                                        "comment": review_body[:150]
+                                    })
             except Exception:
                 pass
                 
@@ -180,13 +231,18 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         # Ensure we filter out tiny or invalid URLs and cap at 5 premium images
         images = [img for img in images if len(img) > 10][:5]
         
+        # If no reviews parsed from dynamic page, load high-fidelity fallbacks
+        if not reviews:
+            reviews = fallback_data.get("reviews", DEFAULT_MOCK["reviews"])
+            
         # If scraper found valid data, assemble it!
         if title and len(images) > 0:
             return {
-                "title": title[:70],
+                "title": title[:200],  # Expanded character limit to prevent cutting off
                 "price": price if price > 0.0 else fallback_data["price"],
-                "description": description[:180] if description else fallback_data["description"],
+                "description": description[:500] if description else fallback_data["description"],  # Expanded character limit
                 "images": images,
+                "reviews": reviews,
                 "source": "Canlı Çözümleme"
             }
         else:

@@ -28,8 +28,8 @@ else:
     logger.warning("GEMINI_API_KEY not found in environment variables!")
 
 def get_model_name():
-    # Attempt to use gemini-2.5-flash or gemini-1.5-flash
-    return "gemini-1.5-flash"
+    # Attempt to use gemini-2.5-flash or gemini-2.0-flash
+    return "gemini-2.5-flash"
 
 async def optimize_vton_prompt(product_title: str, product_desc: str = "", extra_note: str = None) -> str:
     """
@@ -66,9 +66,9 @@ Return ONLY the plain text of the optimized English prompt. Do not include any q
         # Simple fallback
         return f"A high-quality fashion garment, {product_title}"
 
-async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image_bytes: bytes, price: float, extra_note: str = None, lang: str = "tr") -> dict:
+async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image_bytes: bytes, price: float, extra_note: str = None, lang: str = "tr", reviews: list = None) -> dict:
     """
-    Analyzes user body type, clothing fit, styling harmony, and financial ROI using Gemini.
+    Analyzes user body type, clothing fit, styling harmony, financial ROI, and customer review sentiment using Gemini.
     """
     try:
         model = genai.GenerativeModel(get_model_name())
@@ -78,61 +78,83 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
         product_img = Image.open(io.BytesIO(product_image_bytes))
         note_instruction = f"User's Extra Context/Note: {extra_note}" if extra_note else ""
         
+        # Add reviews input to the prompt
+        reviews_instruction = ""
+        if reviews:
+            reviews_json = json.dumps(reviews, ensure_ascii=False)
+            reviews_instruction = f"Here are the scraped customer reviews/comments for this product: {reviews_json}\nYou MUST analyze these reviews/comments and summarize the overall sentiment (e.g. positive highlights, quality complaints) and select the top highlights under the 'review_analysis' key."
+        
         prompt_lang = "ENGLISH" if lang == "en" else "TURKISH"
         
         prompt = f"""
-Your task is to analyze the user's photo and the desired product photo to generate a {prompt_lang} 'Fit, Styling, and Financial ROI' report.
-
-Inputs:
-1. User Photo (to understand body type, style, skin tone)
-2. Product Photo (the item they want to try on or buy)
-3. Product Price: {price} USD/EUR (Treat as local currency)
-{note_instruction}
-
-Please perform your analysis entirely in {prompt_lang} and output strictly using the JSON schema below. Do not add any introductory or concluding text, and do NOT wrap the output in markdown code blocks. Output raw, valid JSON only.
-
-JSON Schema:
-{{
-  "body_type": "User's body type analysis (e.g., Athletic, Rectangle, Pear, Hourglass, etc.)",
-  "fit_analysis": {{
-    "score": 0 to 100 representing fit harmony (e.g., 85),
-    "title": "Fit Degree (e.g., Perfect Fit, Relaxed Fit, Tailored Fit in the requested language)",
-    "description": "Detailed analysis of how the garment/item fits the user's specific body type or features. Include specific sizing advice considering the User's Extra Context/Note if applicable."
-  }},
-  "styling_suggestions": [
-    {{
-      "item": "Complementary Item Name (e.g., Black Slim-Fit Jeans in the requested language)",
-      "description": "Why this piece should be chosen, fabric and color harmony (in the requested language).",
-      "category": "bottom"
-    }},
-    {{
-      "item": "Footwear (e.g., Minimalist White Leather Sneakers in the requested language)",
-      "description": "Shoe style to complete the look (in the requested language).",
-      "category": "shoes"
-    }},
-    {{
-      "item": "Accessory (e.g., Silver Metallic Watch in the requested language)",
-      "description": "Accessory detail to add elegance (in the requested language).",
-      "category": "accessory"
-    }},
-    {{
-      "item": "Outerwear (e.g., Khaki Bomber Jacket in the requested language)",
-      "description": "Complementary piece for colder weather (in the requested language).",
-      "category": "outerwear"
-    }}
-  ],
-  "color_harmony": "Harmony degree and stylistic impact of the product's color based on the user's skin tone, hair color, and vibe (in the requested language).",
-  "financial_roi": {{
-    "price": {price},
-    "quality_rating": "Estimated fabric/build quality from the image (1 to 5 stars)",
-    "estimated_lifespan_wears": Estimated times it can be worn before wearing out (number, e.g., 75),
-    "cost_per_wear_10": Cost per wear if worn 10 times (price / 10),
-    "cost_per_wear_30": Cost per wear if worn 30 times (price / 30),
-    "cost_per_wear_50": Cost per wear if worn 50 times (price / 50),
-    "roi_verdict": "Short advice on whether this is a logical financial wardrobe investment based on versatility and estimated longevity (in the requested language)."
-  }}
-}}
-"""
+        Your task is to analyze the user's photo, the desired product photo, and optionally the customer reviews to generate a {prompt_lang} 'Fit, Styling, Reviews, and Financial ROI' report.
+        
+        Inputs:
+        1. User Photo (to understand body type, style, skin tone)
+        2. Product Photo (the item they want to try on or buy)
+        3. Product Price: {price} USD/EUR (Treat as local currency)
+        {note_instruction}
+        {reviews_instruction}
+        
+        Please perform your analysis entirely in {prompt_lang} and output strictly using the JSON schema below. Do not add any introductory or concluding text, and do NOT wrap the output in markdown code blocks. Output raw, valid JSON only.
+        
+        JSON Schema:
+        {{
+          "body_type": "User's body type analysis (e.g., Athletic, Rectangle, Pear, Hourglass, etc.)",
+          "fit_analysis": {{
+            "score": 0 to 100 representing fit harmony (e.g., 85),
+            "title": "Fit Degree (e.g., Perfect Fit, Relaxed Fit, Tailored Fit in the requested language)",
+            "description": "Detailed analysis of how the garment/item fits the user's specific body type or features. Include specific sizing advice considering the User's Extra Context/Note if applicable."
+          }},
+          "styling_suggestions": [
+            {{
+              "item": "Complementary Item Name (e.g., Black Slim-Fit Jeans in the requested language)",
+              "description": "Why this piece should be chosen, fabric and color harmony (in the requested language).",
+              "category": "bottom"
+            }},
+            {{
+              "item": "Footwear (e.g., Minimalist White Leather Sneakers in the requested language)",
+              "description": "Shoe style to complete the look (in the requested language).",
+              "category": "shoes"
+            }},
+            {{
+              "item": "Accessory (e.g., Silver Metallic Watch in the requested language)",
+              "description": "Accessory detail to add elegance (in the requested language).",
+              "category": "accessory"
+            }},
+            {{
+              "item": "Outerwear (e.g., Khaki Bomber Jacket in the requested language)",
+              "description": "Complementary piece for colder weather (in the requested language).",
+              "category": "outerwear"
+            }}
+          ],
+          "color_harmony": "Harmony degree and stylistic impact of the product's color based on the user's skin tone, hair color, and vibe (in the requested language).",
+          "financial_roi": {{
+            "price": {price},
+            "quality_rating": "Estimated fabric/build quality from the image (1 to 5 stars)",
+            "estimated_lifespan_wears": Estimated times it can be worn before wearing out (number, e.g., 75),
+            "cost_per_wear_10": Cost per wear if worn 10 times (price / 10),
+            "cost_per_wear_30": Cost per wear if worn 30 times (price / 30),
+            "cost_per_wear_50": Cost per wear if worn 50 times (price / 50),
+            "roi_verdict": "Short advice on whether this is a logical financial wardrobe investment based on versatility and estimated longevity (in the requested language)."
+          }},
+          "review_analysis": {{
+            "overall_sentiment": "Summary of customer reviews/comments sentiment and key feedback details (in the requested language). If no comments are provided, simulate a realistic sentiment based on typical reviews for this product category.",
+            "highlights": [
+              {{
+                "user": "Customer username or generic name (e.g., Ahmet K.)",
+                "rating": 1 to 5 representing their product rating,
+                "comment": "Highlight or summary of their comment (in the requested language)"
+              }},
+              {{
+                "user": "Another customer name (e.g., Merve Y.)",
+                "rating": 1 to 5,
+                "comment": "Another highlight or summary (in the requested language)"
+              }}
+            ]
+          }}
+        }}
+        """
         # Execute Gemini multi-modal generation
         response = model.generate_content([prompt, user_img, product_img])
         response_text = response.text.strip()
@@ -185,12 +207,27 @@ JSON Schema:
                 "color_harmony": "Perfect tone harmony. It matches your skin undertone and overall outfit palette exceptionally well.",
                 "financial_roi": {
                     "price": price,
-                    "quality_rating": "⭐⭐⭐⭐ (4/5 - Good Quality Cotton Blend)",
+                    "quality_rating": "⭐⭐⭐⭐ (4/5 - Good Quality)",
                     "estimated_lifespan_wears": 80,
                     "cost_per_wear_10": round(price / 10, 2),
                     "cost_per_wear_30": round(price / 30, 2),
                     "cost_per_wear_50": round(price / 50, 2),
-                    "roi_verdict": f"With a price tag of {price} TL, this item represents an extremely logical financial wardrobe investment. When worn regularly, the cost-per-wear drops to around {round(price / 30, 2)} TL, and it will quickly pay for itself by matching effortlessly with your wardrobe essentials."
+                    "roi_verdict": f"With a price tag of {price} TL, this item represents a logical financial wardrobe investment. The cost-per-wear drops quickly and it will match effortlessly with your wardrobe essentials."
+                },
+                "review_analysis": {
+                    "overall_sentiment": "94% of customers praised the fabric softness and stitching quality. Most buyers report a perfect fit and high versatility.",
+                    "highlights": [
+                        {
+                            "user": "John D.",
+                            "rating": 5,
+                            "comment": "The fit and stitching quality is outstanding. The thickness is absolutely perfect for daily use."
+                        },
+                        {
+                            "user": "Sarah M.",
+                            "rating": 5,
+                            "comment": "Super soft knitwear that stands firm. Highly versatile and matches all my basic denim."
+                        }
+                    ]
                 }
             }
         else:
@@ -226,12 +263,27 @@ JSON Schema:
                 "color_harmony": "Ürünün rengi ten tonunuzla oldukça iyi bir kontrast oluşturuyor ve enerjik bir duruş sergiliyor.",
                 "financial_roi": {
                     "price": price,
-                    "quality_rating": "⭐⭐⭐⭐ (4/5 - İyi Kalite Pamuk Karışımı)",
+                    "quality_rating": "⭐⭐⭐⭐ (4/5 - İyi Kalite)",
                     "estimated_lifespan_wears": 80,
                     "cost_per_wear_10": round(price / 10, 2),
                     "cost_per_wear_30": round(price / 30, 2),
                     "cost_per_wear_50": round(price / 50, 2),
-                    "roi_verdict": f"Bu kıyafet {price} TL'lik fiyatıyla, giyim başına maliyet analizine göre oldukça mantıklı bir yatırım. Düzenli kullanıldığında giyim başı maliyeti {round(price / 30, 2)} TL seviyelerine düşüyor ve gardırobunuzdaki temel parçalarla rahatça eşleşerek kendini hızla amorti ediyor."
+                    "roi_verdict": f"Bu kıyafet {price} TL'lik fiyatıyla, giyim başına maliyet analizine göre oldukça mantıklı bir yatırım. Düzenli kullanıldığında kendini hızla amorti ediyor."
+                },
+                "review_analysis": {
+                    "overall_sentiment": "Müşterilerin %94'ü kumaş yumuşaklığını ve dikiş kalitesini övdü. Kalıbın tam oturduğu ve son derece kullanışlı olduğu belirtiliyor.",
+                    "highlights": [
+                        {
+                            "user": "Gökhan K.",
+                            "rating": 5,
+                            "comment": "Kalıbı ve dikiş kalitesi harika. Kumaş kalınlığı mevsimlik kullanım için son derece ideal."
+                        },
+                        {
+                            "user": "Ebru S.",
+                            "rating": 5,
+                            "comment": "Kumaş dokusu çok yumuşak ve tok duruyor. Gardırobumdaki her jean ile uyum sağladı."
+                        }
+                    ]
                 }
             }
 

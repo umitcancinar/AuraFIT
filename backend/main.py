@@ -401,6 +401,7 @@ async def try_on(
     extra_note: Optional[str] = Form(None),
     rating: Optional[int] = Form(None),
     lang: str = Form("tr"),
+    product_reviews: Optional[str] = Form(None),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
@@ -445,12 +446,20 @@ async def try_on(
             product_filename=product_image.filename
         )
         
+        reviews_list = None
+        if product_reviews:
+            try:
+                reviews_list = json.loads(product_reviews)
+            except Exception:
+                pass
+
         report_task = generate_styling_and_roi_report(
             user_image_bytes=user_bytes,
             product_image_bytes=product_bytes,
             price=price,
             extra_note=extra_note,
-            lang=lang
+            lang=lang,
+            reviews=reviews_list
         )
         
         # Gather results
@@ -580,6 +589,7 @@ async def parse_link(req: LinkRequest):
             "price": data.get("price", 0.0),
             "description": data.get("description", ""),
             "images": data.get("images", []),
+            "reviews": data.get("reviews", []),
             "source": data.get("source", "Scraper")
         }
     except Exception as e:

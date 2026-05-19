@@ -287,6 +287,7 @@ const productImageInput = document.getElementById("product-image-input");
 const userUploadPreview = document.getElementById("user-upload-preview");
 const productUploadPreview = document.getElementById("product-upload-preview");
 const btnRemoveUserImg = document.getElementById("btn-remove-user-img");
+let scrapedProductReviews = null;
 const btnRemoveProductImg = document.getElementById("btn-remove-product-img");
 
 // Manual Input Elements
@@ -705,6 +706,7 @@ if (btnParseLink) {
                 productTitle.value = data.title || "";
                 productPrice.value = data.price || "";
                 productDesc.value = data.description || "";
+                scrapedProductReviews = data.reviews || null;
 
                 if (data.images && data.images.length > 0) {
                     scrapedImagesCarousel.innerHTML = "";
@@ -961,6 +963,10 @@ btnSubmitTryon.addEventListener("click", async () => {
         formData.append("rating", pRating);
         formData.append("lang", activeLang);
         
+        if (scrapedProductReviews) {
+            formData.append("product_reviews", JSON.stringify(scrapedProductReviews));
+        }
+        
         if (userImageInput.files[0]) {
             formData.append("user_image", userImageInput.files[0]);
             imgCompareBefore.src = URL.createObjectURL(userImageInput.files[0]);
@@ -1104,6 +1110,44 @@ function renderReports(report, price) {
             `;
             repStylistList.appendChild(sItem);
         });
+    }
+
+    // Card D: Yorum Analizi Rendering
+    const repReviewSentiment = document.getElementById("rep-review-sentiment");
+    const repReviewHighlights = document.getElementById("rep-review-highlights");
+    
+    if (repReviewSentiment && repReviewHighlights) {
+        const reviewAnalysis = report.review_analysis || {
+            overall_sentiment: activeLang === "tr" 
+                ? "Bu ürün grubu için genel müşteri geri bildirimleri kumaş kalitesi yönündedir." 
+                : "General customer reviews highlight the quality of the fabric.",
+            highlights: []
+        };
+        
+        repReviewSentiment.innerText = reviewAnalysis.overall_sentiment;
+        repReviewHighlights.innerHTML = "";
+        
+        if (reviewAnalysis.highlights && reviewAnalysis.highlights.length > 0) {
+            reviewAnalysis.highlights.forEach(h => {
+                const commentDiv = document.createElement("div");
+                commentDiv.className = "scraped-comment-item";
+                commentDiv.style.cssText = "padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); font-family: 'Outfit', sans-serif; font-size: 0.78rem;";
+                
+                let starsHtml = "";
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="fa-solid fa-star" style="color: ${i <= h.rating ? '#ff9f0a' : 'rgba(255,255,255,0.15)'}; font-size: 0.65rem;"></i>`;
+                }
+                
+                commentDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-weight: 600; color: #fff;">${h.user}</span>
+                        <div style="display: flex; gap: 2px;">${starsHtml}</div>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.7); margin: 0; line-height: 1.3;">"${h.comment}"</p>
+                `;
+                repReviewHighlights.appendChild(commentDiv);
+            });
+        }
     }
 }
 
