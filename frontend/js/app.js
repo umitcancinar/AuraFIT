@@ -132,6 +132,7 @@ const translations = {
         "reg-t": "Hesap Oluşturun",
         "reg-sub": "Akıllı kabin ve bütçe ROI analizlerini kullanmaya başlayın.",
         "btn-register-action": "KAYIT OL VE GİRİŞ YAP",
+        "kvkk-text": "Yüklediğim fotoğrafların yalnızca benim tarafımdan görüntülenebileceğini ve istediğim zaman arşivden tamamen silebileceğimi okudum, onaylıyorum.",
         "hist-header": "Kişisel Sanal Kabin Arşiviniz",
         "hist-sub": "PostgreSQL Neon DB'de güvenle saklanan önceki denemeleriniz.",
         "chat_title": "Terzi AI Asistanı",
@@ -257,6 +258,7 @@ const translations = {
         "reg-t": "Create Account",
         "reg-sub": "Start trying clothes on yourself and auditing financial returns.",
         "btn-register-action": "REGISTER & SIGN IN",
+        "kvkk-text": "I confirm that the photos I upload will only be visible to me, and I can completely delete them from my archive at any time.",
         "hist-header": "Your Personal Kabin Archives",
         "hist-sub": "Previous trials safely synced to our Neon PostgreSQL database.",
         "chat_title": "Tailor AI Assistant",
@@ -369,6 +371,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initial Login Verification
     verifySavedSession();
+
+    // --- KVKK CHECKBOX LOGIC ---
+    const kvkkCheckbox = document.getElementById("kvkk-checkbox");
+    const btnRegisterSubmit = document.getElementById("btn-register-submit");
+
+    if (kvkkCheckbox && btnRegisterSubmit) {
+        kvkkCheckbox.addEventListener("change", function() {
+            if (this.checked) {
+                btnRegisterSubmit.disabled = false;
+                btnRegisterSubmit.style.opacity = "1";
+                btnRegisterSubmit.style.cursor = "pointer";
+            } else {
+                btnRegisterSubmit.disabled = true;
+                btnRegisterSubmit.style.opacity = "0.5";
+                btnRegisterSubmit.style.cursor = "not-allowed";
+            }
+        });
+    }
 
     // Init Public Landing Compare slider
     initCompareSlider("landing-compare-slider", "landing-after-wrapper", "landing-slider-bar");

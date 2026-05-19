@@ -671,7 +671,13 @@
                         <i class="fa-solid fa-key input-icon-left"></i>
                         <input type="password" id="register-password" required placeholder="Şifre" class="premium-input" data-i18n-placeholder="m-p-pass">
                     </div>
-                    <button type="submit" class="btn-submit-tryon margin-top-sm">
+                    <div class="input-wrapper kvkk-wrapper" style="display: flex; align-items: start; gap: 10px; margin-top: 15px; margin-bottom: 5px;">
+                        <input type="checkbox" id="kvkk-checkbox" style="margin-top: 5px; accent-color: var(--primary); cursor: pointer; width: 18px; height: 18px; flex-shrink: 0;">
+                        <label for="kvkk-checkbox" style="font-size: 0.85rem; color: var(--text-muted); text-align: left; line-height: 1.4; cursor: pointer;" data-i18n="kvkk-text">
+                            Yüklediğim fotoğrafların yalnızca benim tarafımdan görüntülenebileceğini ve istediğim zaman arşivden tamamen silebileceğimi okudum, onaylıyorum.
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-submit-tryon margin-top-sm" id="btn-register-submit" disabled style="opacity: 0.5; cursor: not-allowed;">
                         <span data-i18n="btn-register-action">KAYIT OL VE GİRİŞ YAP</span>
                         <i class="fa-solid fa-user-plus"></i>
                     </button>
