@@ -3,6 +3,14 @@ import json
 import logging
 import io
 
+# Load backend/.env regardless of process cwd (Vercel uses dashboard env vars)
+try:
+    from dotenv import load_dotenv
+    _BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    load_dotenv(os.path.join(_BACKEND_DIR, ".env"))
+except ImportError:
+    pass
+
 # Safe imports — these may fail on Vercel serverless due to binary deps
 try:
     import google.generativeai as genai
@@ -17,19 +25,42 @@ except ImportError as _e:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize Gemini API
-api_key = os.getenv("GEMINI_API_KEY", "").strip()
-if _GEMINI_AVAILABLE and api_key:
+def _get_api_key() -> str:
+    return os.getenv("GEMINI_API_KEY", "").strip()
+
+def _ensure_gemini_configured() -> bool:
+    """Configure SDK on demand so dotenv/main.py env loading is always respected."""
+    if not _GEMINI_AVAILABLE:
+        return False
+    api_key = _get_api_key()
+    if not api_key:
+        return False
     genai.configure(api_key=api_key)
-    logger.info("Gemini API configured successfully.")
-elif not _GEMINI_AVAILABLE:
-    logger.warning("Gemini SDK not available (import failed). Fallback mode active.")
-else:
-    logger.warning("GEMINI_API_KEY not found in environment variables!")
+    return True
 
 def get_model_name():
-    # Attempt to use the latest Gemini 3 Flash model
-    return "gemini-3-flash-preview"
+    # gemini-2.5-flash: stable, available on free tier (gemini-3-flash-preview often 429/quota)
+    return os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
+def _response_text(response) -> str:
+    """Extract text safely; avoids NoneType when safety filters block output."""
+    if response is None:
+        raise ValueError("Gemini returned an empty response")
+    try:
+        text = response.text
+        if text and text.strip():
+            return text.strip()
+    except (ValueError, AttributeError):
+        pass
+    parts = []
+    for candidate in getattr(response, "candidates", None) or []:
+        content = getattr(candidate, "content", None)
+        for part in getattr(content, "parts", None) or []:
+            if getattr(part, "text", None):
+                parts.append(part.text)
+    if parts:
+        return "\n".join(parts).strip()
+    raise ValueError("Gemini returned no text (content may have been blocked by safety filters)")
 
 async def _gemini_generate_with_retry(model, content, max_retries=2, base_wait=2):
     """
@@ -64,6 +95,9 @@ async def optimize_vton_prompt(product_title: str, product_desc: str = "", extra
     """
     Translates product details and extra notes into an English technical VTON prompt.
     """
+    if not _ensure_gemini_configured():
+        logger.warning("Gemini unavailable for optimize_vton_prompt — using title fallback")
+        return f"A high-quality fashion garment, {product_title}"
     try:
         model = genai.GenerativeModel(get_model_name())
         
@@ -87,7 +121,7 @@ For example, "Red Oversized T-shirt" -> "A red oversized cotton t-shirt, plain s
 Return ONLY the plain text of the optimized English prompt. Do not include any quotes, markdown, or conversational filler.
 """
         response = await _gemini_generate_with_retry(model, prompt)
-        optimized_prompt = response.text.strip()
+        optimized_prompt = _response_text(response)
         logger.info(f"Optimized prompt generated: {optimized_prompt}")
         return optimized_prompt
     except Exception as e:
@@ -99,6 +133,8 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
     """
     Analyzes user body type, clothing fit, styling harmony, financial ROI, and customer review sentiment using Gemini.
     """
+    if not _ensure_gemini_configured():
+        return _gemini_unavailable_report(price, lang)
     try:
         model = genai.GenerativeModel(get_model_name())
         
@@ -194,7 +230,7 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
             
         # Execute Gemini multi-modal generation
         response = await _gemini_generate_with_retry(model, content_parts)
-        response_text = response.text.strip()
+        response_text = _response_text(response)
         
         # Robustly extract JSON using regex in case Gemini adds markdown or conversational text
         import re
@@ -243,10 +279,35 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
             }
         }
 
+def _gemini_unavailable_report(price: float, lang: str) -> dict:
+    msg_tr = "Yapay zeka servisi yapılandırılmamış. GEMINI_API_KEY ortam değişkenini kontrol edin."
+    msg_en = "AI service is not configured. Please check the GEMINI_API_KEY environment variable."
+    msg = msg_en if lang == "en" else msg_tr
+    return {
+        "body_type": msg,
+        "fit_analysis": {"score": 0, "title": "Servis Kullanılamıyor", "description": msg},
+        "styling_suggestions": [],
+        "color_harmony": msg,
+        "financial_roi": {
+            "price": price,
+            "quality_rating": "N/A",
+            "estimated_lifespan_wears": 0,
+            "cost_per_wear_10": 0,
+            "cost_per_wear_30": 0,
+            "cost_per_wear_50": 0,
+            "roi_verdict": msg,
+        },
+        "review_analysis": {"overall_sentiment": "", "highlights": []},
+    }
+
 async def get_chatbot_reply(user_message: str, lang: str = "tr") -> str:
     """
     Generates intelligent tailor/fashion styling advice from Gemini.
     """
+    if not _ensure_gemini_configured():
+        if lang == "en":
+            return "AI assistant is temporarily unavailable. Please ensure GEMINI_API_KEY is configured on the server."
+        return "Yapay zeka asistanı şu an kullanılamıyor. Sunucuda GEMINI_API_KEY yapılandırmasını kontrol edin."
     try:
         model = genai.GenerativeModel(get_model_name())
         system_instruction = """
@@ -258,7 +319,7 @@ Do not output markdown code blocks. Just plain styling advice text.
 """
         prompt = f"{system_instruction}\nUser Message: {user_message}\nRequested Language: {lang.upper()}\nReply:"
         response = await _gemini_generate_with_retry(model, prompt)
-        return response.text.strip()
+        return _response_text(response)
     except Exception as e:
         error_msg = str(e)
         logger.error(f"Error in get_chatbot_reply: {error_msg}")

@@ -21,8 +21,8 @@ import uuid
 from sqlalchemy.orm import Session
 from typing import Optional
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from backend/.env (works even when cwd is repo root)
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Setup logger
 logging.basicConfig(level=logging.INFO)
