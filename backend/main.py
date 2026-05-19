@@ -469,15 +469,20 @@ async def try_on(
                 styling_report["financial_roi"] = {}
             styling_report["financial_roi"]["quality_rating"] = f"{stars} ({rating}/5 - {label})"
         
-        # 3. CONVERT RESULT PATH TO ACCESSIBLE URL
+        # 3. CONVERT RESULT PATH TO ACCESSIBLE URL WITH UNIQUE FILENAME TO PREVENT CACHING
         result_relative_name = os.path.basename(result_image_path)
+        unique_filename = f"vton_{uuid.uuid4().hex[:8]}_{result_relative_name}"
+        target_path = os.path.join(OUTPUTS_DIR, unique_filename)
         
-        if "outputs" in result_image_path:
-            image_url = f"/uploads/outputs/{result_relative_name}"
-        else:
-            target_path = os.path.join(OUTPUTS_DIR, result_relative_name)
-            if not os.path.exists(target_path) and os.path.exists(result_image_path):
+        try:
+            if os.path.exists(result_image_path):
                 shutil.copy(result_image_path, target_path)
+                image_url = f"/uploads/outputs/{unique_filename}"
+            else:
+                # Fallback if source path is not directly accessible
+                image_url = f"/uploads/outputs/{result_relative_name}"
+        except Exception as copy_err:
+            logger.error(f"Error copying unique VTON result: {str(copy_err)}")
             image_url = f"/uploads/outputs/{result_relative_name}"
             
         logger.info(f"VTON Result url: {image_url}")
