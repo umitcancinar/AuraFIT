@@ -22,3 +22,5 @@ backend/uploads/outputs/*
 !backend/uploads/outputs/result_man_blue_hoodie.jpg
 !backend/uploads/outputs/result_woman_green_dress.jpg
 !backend/uploads/outputs/result_woman_red_sweater.jpg
+.vercel
+.env*.local

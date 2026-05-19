@@ -2808,13 +2808,28 @@ body.light-theme .apple-btn-primary:hover {
 
 /* Premium Glow Action Button */
 .premium-btn-glow {
+    padding: 10px 18px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: linear-gradient(135deg, #0071e3, #00c6ff);
+    color: white;
+    white-space: nowrap;
+    flex-shrink: 0;
+    outline: none;
     box-shadow: 0 4px 15px rgba(0, 113, 227, 0.35);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
 }
 .premium-btn-glow:hover:not(:disabled) {
     transform: translateY(-1.5px) scale(1.03);
     box-shadow: 0 6px 20px rgba(0, 113, 227, 0.5);
-    filter: brightness(1.1);
+    background: linear-gradient(135deg, #0080ff, #33d6ff);
 }
 .premium-btn-glow:active:not(:disabled) {
     transform: translateY(0.5px) scale(0.98);
@@ -2824,5 +2839,60 @@ body.light-theme .apple-btn-primary:hover {
     color: rgba(255,255,255,0.3) !important;
     cursor: not-allowed;
     box-shadow: none;
+}
+
+/* Experimental Features Buttons */
+.btn-experimental {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.75);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+.btn-experimental:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    transform: translateY(-1.5px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.btn-experimental:active {
+    transform: translateY(0.5px) scale(0.98);
+}
+
+/* Jury Agreement Button */
+.btn-jury-agree {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #00d2ff, #0066ff) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-family: var(--font-sans);
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.btn-jury-agree:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.45);
+    background: linear-gradient(135deg, #00e5ff, #0077ff) !important;
+}
+.btn-jury-agree:active {
+    transform: translateY(0.5px) scale(0.98);
 }
 

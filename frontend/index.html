@@ -213,7 +213,7 @@
                             <i class="fa-solid fa-folder-open"></i>
                             <span data-i18n="btn-my-history">Kabin Geçmişim</span>
                         </button>
-                        <button type="button" class="btn-auth btn-logout" id="btn-logout" title="Çıkış Yap">
+                        <button type="button" class="btn-circle btn-logout" id="btn-logout" title="Çıkış Yap">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </button>
                     </div>
@@ -273,7 +273,7 @@
                         <span style="font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 8px;">E-Ticaret Linki ile Çözümle</span>
                         <div style="display: flex; gap: 8px; width: 100%; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px; border-radius: 12px;">
                             <input type="text" id="product-link-input" placeholder="Trendyol, H&M, Zara, Amazon linkini yapıştırın..." data-i18n-placeholder="placeholder-link-input" style="flex: 1; min-width: 0; background: transparent; border: none; padding: 10px 14px; font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: #fff; outline: none; margin: 0;">
-                            <button type="button" id="btn-parse-link" class="premium-btn-glow" style="padding: 10px 18px; font-weight: 600; font-family: 'Outfit', sans-serif; cursor: pointer; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border: none; background: linear-gradient(135deg, #0071e3, #00c6ff); color: white; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; outline: none;">
+                            <button type="button" id="btn-parse-link" class="premium-btn-glow">
                                 <span data-i18n="btn-parse-link">Çözümle</span> <i class="fa-solid fa-wand-magic-sparkles"></i>
                             </button>
                         </div>
@@ -356,7 +356,7 @@
                 </div>
 
                 <!-- STEP 4: SUBMIT BUTTON -->
-                <button type="button" class="btn-submit-tryon apple-btn-primary" id="btn-submit-tryon">
+                <button type="button" class="btn-submit-tryon" id="btn-submit-tryon">
                     <span data-i18n="btn-submit-tryon">GENERATE VIRTUAL CABIN</span>
                     <i class="fa-solid fa-sparkles"></i>
                 </button>
@@ -462,16 +462,16 @@
                             <span style="font-size: 0.65rem; padding: 2px 8px; border-radius: 6px; background: rgba(245,158,11,0.15); color: #f59e0b; font-weight: 600; letter-spacing: 0.5px;">GELİŞTİRME AŞAMASINDA</span>
                         </div>
                         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            <button type="button" class="btn-experimental" onclick="alert('Bu özellik geliştirme aşamasındadır. Yakında aktif olacaktır!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                            <button type="button" class="btn-experimental" onclick="alert('Bu özellik geliştirme aşamasındadır. Yakında aktif olacaktır!')">
                                 <i class="fa-solid fa-link" style="color: #6366f1;"></i> Ürün Linkinden Analiz
                             </button>
-                            <button type="button" class="btn-experimental" onclick="alert('E-ticaret platform entegrasyonu geliştirme aşamasındadır. Yakında aktif olacaktır!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                            <button type="button" class="btn-experimental" onclick="alert('E-ticaret platform entegrasyonu geliştirme aşamasındadır. Yakında aktif olacaktır!')">
                                 <i class="fa-solid fa-cart-shopping" style="color: #ec4899;"></i> E-Ticaret Platformuna Bağla
                             </button>
-                            <button type="button" class="btn-experimental" onclick="alert('Paylaşım ve sosyal medya entegrasyonu geliştirme aşamasındadır!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                            <button type="button" class="btn-experimental" onclick="alert('Paylaşım ve sosyal medya entegrasyonu geliştirme aşamasındadır!')">
                                 <i class="fa-solid fa-share-nodes" style="color: #22d3ee;"></i> Sonucu Paylaş
                             </button>
-                            <button type="button" class="btn-experimental" onclick="alert('Gardrobe AI özelliği geliştirme aşamasındadır. Yakında gardırobunuzu analiz edebileceksiniz!')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: rgba(255,255,255,0.75); font-family: 'Outfit', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.3s ease;">
+                            <button type="button" class="btn-experimental" onclick="alert('Gardrobe AI özelliği geliştirme aşamasındadır. Yakında gardırobunuzu analiz edebileceksiniz!')">
                                 <i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i> Gardrop AI Analizi
                             </button>
                         </div>
@@ -710,7 +710,7 @@
                     </ul>
                 </div>
                 
-                <button type="button" class="btn-submit-tryon" id="btn-agree-jury" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #00d2ff, #0066ff); border: none; border-radius: 12px; color: white; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3); box-sizing: border-box;">
+                <button type="button" class="btn-jury-agree" id="btn-agree-jury">
                     Hemen Sanal Kabini Keşfet
                 </button>
             </div>

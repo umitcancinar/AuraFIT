@@ -508,7 +508,9 @@ function logoutUser() {
     setGuestUIState();
 }
 
-btnLogout.addEventListener("click", logoutUser);
+if (btnLogout) {
+    btnLogout.addEventListener("click", logoutUser);
+}
 
 /* ----------------------------------------------------
    3. AUTHENTICATION POPUP MODAL CONTROL
