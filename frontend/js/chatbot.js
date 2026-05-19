@@ -213,6 +213,13 @@
                 welcomeText.innerHTML = transDict.chat_bubble_hello || "Merhaba, ben asistanın Terzican! Sana yardımcı olabilirim. 🧵";
             }
             welcomeBubble.classList.add('show');
+            
+            // Automatically hide after 5 seconds (5000ms)
+            setTimeout(() => {
+                if (welcomeBubble && !windowEl.classList.contains('open')) {
+                    welcomeBubble.classList.remove('show');
+                }
+            }, 5000);
         }
     }, 2500);
 
