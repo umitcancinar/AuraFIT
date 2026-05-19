@@ -261,8 +261,38 @@ def _extract_json_ld_product(soup: BeautifulSoup) -> Dict[str, Any]:
 
 
 def _extract_barcode_from_html(html_content: str) -> Optional[str]:
-    match = re.search(r"barcode\s*:\s*['\"](\d{10,14})['\"]", html_content, re.IGNORECASE)
-    return match.group(1) if match else None
+    patterns = [
+        r"barcode\s*:\s*['\"](\d{10,14})['\"]",
+        r'"barcode"\s*:\s*"(\d{10,14})"',
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, html_content, re.IGNORECASE)
+        if match:
+            return match.group(1)
+    return None
+
+
+def _extract_fabric_attributes_from_html(html_content: str) -> str:
+    """Extract Materyal / Kumaş attributes from Trendyol & similar embedded JSON."""
+    fabric_parts = []
+    seen = set()
+    for key, val in re.findall(
+        r'\{"key":\{"id":\d+,"name":"([^"]+)"\},"value":\{"id":\d+,"name":"([^"]+)"\}',
+        html_content,
+    ):
+        key_lower = key.lower()
+        if not any(token in key_lower for token in ("materyal", "kumaş", "içerik", "komposisyon")):
+            continue
+        entry = f"{key}: {val}"
+        if entry not in seen:
+            seen.add(entry)
+            fabric_parts.append(entry)
+    if fabric_parts:
+        return " | ".join(fabric_parts)[:500]
+    pct = re.search(r"(\d{1,3}\s*%\s*[\wçğıöşüÇĞİÖŞÜ]+(?:\s*,\s*\d{1,3}\s*%\s*[\wçğıöşüÇĞİÖŞÜ]+){1,5})", html_content, re.I)
+    if pct:
+        return f"Ürün içeriği: {pct.group(1).strip()}"[:500]
+    return ""
 
 
 async def _fetch_madmext_reviews(barcode: str) -> List[dict]:
@@ -435,6 +465,13 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
                     description = detail_text[:500]
         
         description = _format_product_description(description)
+
+        if _is_seo_junk_description(description):
+            fabric_info = _extract_fabric_attributes_from_html(html_content)
+            if fabric_info:
+                description = fabric_info
+            elif ld_description and not _is_seo_junk_description(ld_description):
+                description = _format_product_description(ld_description)
             
         # 3. Parse Price
         if price == 0.0:
@@ -482,18 +519,22 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         # Ensure we filter out tiny or invalid URLs and cap at 5 premium images
         images = [img for img in images if len(img) > 10][:5]
         
+        barcode = _extract_barcode_from_html(html_content)
+
         if not reviews and "trendyol.com" in url_lower:
             content_id_match = re.search(r'-p-(\d+)', url)
             if content_id_match:
                 reviews = await _fetch_trendyol_reviews(content_id_match.group(1))
+            if not reviews and barcode:
+                reviews = await _fetch_madmext_reviews(barcode)
+                if reviews:
+                    logger.info(f"Trendyol page: used Madmext review proxy for barcode {barcode}")
         
         if not reviews and "madmext.com" in url_lower:
-            barcode = _extract_barcode_from_html(html_content)
             if barcode:
                 reviews = await _fetch_madmext_reviews(barcode)
-        
-        if not reviews:
-            reviews = []
+
+        reviews = reviews[:8] if reviews else []
             
         # If scraper found valid data, assemble it!
         if title and len(images) > 0:
