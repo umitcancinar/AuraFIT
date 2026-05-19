@@ -47,6 +47,7 @@ const translations = {
         "upload-product-title": "Kıyafet Görseli Yükleyin",
         "upload-product-desc": "Beyaz arka planlı kıyafet görselleri önerilir",
         "quick-garments": "Hızlı Deneme Kıyafetleri:",
+        "rating-select-label": "Kumaş Kalitesi / Ürün Puanı:",
         "garment-blue-hoodie": "Mavi Hoodie",
         "garment-red-sweater": "Kırmızı Kazak",
         "garment-green-dress": "Yeşil Elbise",
@@ -160,6 +161,7 @@ const translations = {
         "upload-product-title": "Upload Garment Image",
         "upload-product-desc": "Pure white background clothes recommended",
         "quick-garments": "Quick Trial Clothes:",
+        "rating-select-label": "Fabric Quality / Product Score:",
         "garment-blue-hoodie": "Blue Hoodie",
         "garment-red-sweater": "Red Sweater",
         "garment-green-dress": "Green Dress",
@@ -633,8 +635,37 @@ productTemplates.forEach(card => {
         productPrice.value = card.dataset.price;
         productDesc.value = card.dataset.desc;
         
+        // Update star selector value
+        if (card.dataset.rating) {
+            updateInteractiveRating(parseInt(card.dataset.rating, 10));
+        }
+        
         productImageInput.value = "";
         productUploadPreview.classList.add("hidden");
+    });
+});
+
+// Dynamic Star Rating Interactive Control
+function updateInteractiveRating(val) {
+    const ratingInput = document.getElementById("product-rating");
+    if (ratingInput) ratingInput.value = val;
+    
+    const stars = document.querySelectorAll("#product-rating-selector .star-option");
+    stars.forEach((star, index) => {
+        if (index < val) {
+            star.classList.add("active");
+            star.style.color = "#ff9f0a";
+        } else {
+            star.classList.remove("active");
+            star.style.color = "rgba(255, 255, 255, 0.2)";
+        }
+    });
+}
+
+document.querySelectorAll("#product-rating-selector .star-option").forEach(star => {
+    star.addEventListener("click", () => {
+        const val = parseInt(star.dataset.value, 10);
+        updateInteractiveRating(val);
     });
 });
 
@@ -809,6 +840,11 @@ btnSubmitTryon.addEventListener("click", async () => {
             formData.append("extra_note", pExtra);
         }
         
+        // Add Dynamic Star Rating selection
+        const ratingInput = document.getElementById("product-rating");
+        const pRating = ratingInput ? ratingInput.value : "4";
+        formData.append("rating", pRating);
+        
         if (userImageInput.files[0]) {
             formData.append("user_image", userImageInput.files[0]);
             imgCompareBefore.src = URL.createObjectURL(userImageInput.files[0]);
@@ -856,7 +892,11 @@ btnSubmitTryon.addEventListener("click", async () => {
             stateLoading.classList.add("hidden");
             stateSuccess.classList.remove("hidden");
             
-            document.getElementById("panel-results").scrollIntoView({ behavior: "smooth" });
+            const panelResults = document.getElementById("panel-results");
+            if (panelResults) {
+                panelResults.scrollTop = 0;
+            }
+            panelResults.scrollIntoView({ behavior: "smooth" });
             initCompareSlider("dashboard-compare-slider", "dashboard-after-wrapper", "dashboard-slider-bar");
         }
     } catch (err) {
@@ -1095,7 +1135,11 @@ function renderHistoryGrid(history) {
             stateEmpty.classList.add("hidden");
             stateSuccess.classList.remove("hidden");
             
-            document.getElementById("panel-results").scrollIntoView({ behavior: "smooth" });
+            const panelResults = document.getElementById("panel-results");
+            if (panelResults) {
+                panelResults.scrollTop = 0;
+            }
+            panelResults.scrollIntoView({ behavior: "smooth" });
             initCompareSlider("dashboard-compare-slider", "dashboard-after-wrapper", "dashboard-slider-bar");
         });
         

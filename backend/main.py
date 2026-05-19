@@ -375,6 +375,7 @@ async def try_on(
     product_desc: str = Form(""),
     price: float = Form(...),
     extra_note: Optional[str] = Form(None),
+    rating: Optional[int] = Form(None),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
@@ -428,6 +429,23 @@ async def try_on(
         
         # Gather results
         result_image_path, styling_report = await asyncio.gather(vton_task, report_task)
+        
+        # Override the quality_rating if the user explicitly provided a rating
+        if rating and 1 <= rating <= 5:
+            stars = "⭐" * rating
+            quality_labels = {
+                5: "Premium Kalite Pamuk/İpek Karışımı",
+                4: "İyi Kalite Pamuk Karışımı",
+                3: "Standart Kalite Polyester/Pamuk",
+                2: "Düşük Kalite Sentetik Karışım",
+                1: "Zayıf Kalite İnce Kumaş"
+            }
+            label = quality_labels.get(rating, "İyi Kalite")
+            if not styling_report:
+                styling_report = {}
+            if "financial_roi" not in styling_report or not isinstance(styling_report["financial_roi"], dict):
+                styling_report["financial_roi"] = {}
+            styling_report["financial_roi"]["quality_rating"] = f"{stars} ({rating}/5 - {label})"
         
         # 3. CONVERT RESULT PATH TO ACCESSIBLE URL
         result_relative_name = os.path.basename(result_image_path)

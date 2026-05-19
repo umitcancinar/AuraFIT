@@ -276,21 +276,34 @@
                             <input type="number" id="product-price" placeholder="Price (USD/EUR)" data-i18n-placeholder="placeholder-price" class="premium-input">
                             <textarea id="product-desc" placeholder="Fabric, cut, brand details (Optional)" data-i18n-placeholder="placeholder-desc" class="premium-input text-area"></textarea>
                         </div>
+                        
+                        <!-- Premium Dynamic Star Rating Fabric Quality Input -->
+                        <div class="rating-input-container" style="margin-top: 15px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 12px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                            <span style="font-family: 'Outfit', sans-serif; font-size: 0.9rem; color: rgba(255,255,255,0.8); font-weight: 500;" data-i18n="rating-select-label">Kumaş Kalitesi / Ürün Puanı:</span>
+                            <div class="stars-selector" id="product-rating-selector" style="display: flex; gap: 6px;">
+                                <i class="fa-solid fa-star star-option active" data-value="1" style="font-size: 1.4rem; color: #ff9f0a; cursor: pointer; transition: transform 0.2s;"></i>
+                                <i class="fa-solid fa-star star-option active" data-value="2" style="font-size: 1.4rem; color: #ff9f0a; cursor: pointer; transition: transform 0.2s;"></i>
+                                <i class="fa-solid fa-star star-option active" data-value="3" style="font-size: 1.4rem; color: #ff9f0a; cursor: pointer; transition: transform 0.2s;"></i>
+                                <i class="fa-solid fa-star star-option active" data-value="4" style="font-size: 1.4rem; color: #ff9f0a; cursor: pointer; transition: transform 0.2s;"></i>
+                                <i class="fa-solid fa-star star-option" data-value="5" style="font-size: 1.4rem; color: rgba(255,255,255,0.2); cursor: pointer; transition: transform 0.2s;"></i>
+                            </div>
+                            <input type="hidden" id="product-rating" value="4">
+                        </div>
                     </div>
 
                     <!-- Predefined Garments Templates -->
                     <div class="template-selector margin-top-md">
                         <span class="template-label" data-i18n="quick-garments">Quick Garments:</span>
                         <div class="template-grid" id="product-templates">
-                            <div class="template-card active" data-filename="garment_blue_hoodie.jpg" data-title="Premium Blue Oversize Hoodie" data-price="89.90" data-desc="Unisex 100% cotton, thick, brushed inside blue hoodie.">
+                            <div class="template-card active" data-filename="garment_blue_hoodie.jpg" data-title="Premium Blue Oversize Hoodie" data-price="89.90" data-desc="Unisex 100% cotton, thick, brushed inside blue hoodie." data-rating="4">
                                 <img src="assets/garment_blue_hoodie.jpg" alt="Blue Hoodie">
                                 <span data-i18n="garment-blue-hoodie">Blue Hoodie</span>
                             </div>
-                            <div class="template-card" data-filename="garment_red_sweater.jpg" data-title="Red Knit Turtleneck Sweater" data-price="74.90" data-desc="Knitwear, turtleneck, soft textured winter sweater.">
+                            <div class="template-card" data-filename="garment_red_sweater.jpg" data-title="Red Knit Turtleneck Sweater" data-price="74.90" data-desc="Knitwear, turtleneck, soft textured winter sweater." data-rating="5">
                                 <img src="assets/garment_red_sweater.jpg" alt="Red Sweater">
                                 <span data-i18n="garment-red-sweater">Red Sweater</span>
                             </div>
-                            <div class="template-card" data-filename="garment_green_dress.jpg" data-title="Elegant Green Linen Summer Dress" data-price="149.90" data-desc="Sleeveless, light linen fabric, breathable summer dress.">
+                            <div class="template-card" data-filename="garment_green_dress.jpg" data-title="Elegant Green Linen Summer Dress" data-price="149.90" data-desc="Sleeveless, light linen fabric, breathable summer dress." data-rating="3">
                                 <img src="assets/garment_green_dress.jpg" alt="Green Dress">
                                 <span data-i18n="garment-green-dress">Green Dress</span>
                             </div>
