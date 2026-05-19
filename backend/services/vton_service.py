@@ -113,22 +113,13 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
             
             # Use yisol/IDM-VTON Space client for the absolute highest quality photorealistic results
             def call_gradio():
-                client = Client("yisol/IDM-VTON")
+                client = Client("tonyassi/fashion-try-on")
                 
                 # Predict
                 result = client.predict(
-                    dict={
-                        "background": handle_file(user_image_path),
-                        "layers": [],
-                        "composite": None
-                    },
-                    garm_img=handle_file(product_image_path),
-                    garment_des=prompt,
-                    is_checked=True,
-                    is_checked_crop=False,
-                    denoise_steps=30,
-                    seed=42,
-                    api_name="/tryon"
+                    person=handle_file(user_image_path),
+                    clothing=handle_file(product_image_path),
+                    api_name="/generate"
                 )
                 # The result is typically a list of file paths/details, return the first item which is the image path
                 if isinstance(result, tuple) or isinstance(result, list):
