@@ -1,9 +1,6 @@
 # 🌟 AuraFIT: Geleceğin Yapay Zeka Destekli Akıllı E-Ticaret Kabini
 
 AuraFIT, kullanıcıların e-ticaret sitelerinde beğendikleri kıyafetleri kendi üzerlerinde sanal olarak deneyebildikleri, **Google Gemini 3 Flash** modeliyle akıllı finansal (Cost-per-Wear) ve stilist danışmanlık hizmeti sunan devrim niteliğinde bir platformdur. Apple şıklığında tasarlanmış büyüleyici arayüzü sayesinde kusursuz bir kullanıcı deneyimi sunar.
-
-![AuraFit Landing Page](frontend/assets/docs/hero.png)
-
 ---
 
 ## ✨ Öne Çıkan Süper Özellikler
@@ -23,8 +20,6 @@ Platforma entegre olan AuraFIT Terzi Asistanı, Google'ın piyasadaki en son ve 
 
 ### 👗 Kusursuz Sanal Kabin Deneyimi (IDM-VTON)
 Bulut GPU sunucularımızda paralel olarak çalışan görsel motoru, seçtiğiniz veya linkten kopyaladığınız kıyafeti mankenin (veya kendi yüklediğiniz fotoğrafınızın) üzerine kumaş dokularını ve gölgelendirmelerini koruyarak **kusursuzca giydirir.**
-
-![AuraFit Demo Showcase](frontend/assets/docs/demo.png)
 
 ---
 
