@@ -104,6 +104,60 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
         except Exception as custom_err:
             logger.error(f"Dedicated Custom VTON API failed ({str(custom_err)}). Trying public/local fallbacks...")
                 
+    # 1.7 LOCAL PINOKIO APPLE SILICON (M4) GPU ENGINE
+    local_vton_active = False
+    try:
+        # Check if local Pinokio server is active on port 7860
+        res = requests.get("http://127.0.0.1:7860/", timeout=1.0)
+        if res.status_code == 200:
+            local_vton_active = True
+    except Exception:
+        pass
+
+    if local_vton_active and _GRADIO_AVAILABLE and Client is not None:
+        try:
+            logger.info("Local Pinokio IDM-VTON Engine detected on M4 Mac! Running local high-performance inference...")
+            loop = asyncio.get_event_loop()
+            
+            def call_local_gradio():
+                client = Client("http://127.0.0.1:7860/")
+                result = client.predict(
+                    dict={
+                        "background": handle_file(user_image_path),
+                        "layers": [],
+                        "composite": None
+                    },
+                    garm_img=handle_file(product_image_path),
+                    garment_des=prompt or "kıyafet",
+                    is_checked=True,
+                    is_checked_crop=False,
+                    denoise_steps=30,
+                    seed=42,
+                    api_name="/tryon"
+                )
+                if isinstance(result, tuple) or isinstance(result, list):
+                    res_img = result[0]
+                    if isinstance(res_img, dict) and "path" in res_img:
+                        return res_img["path"]
+                    return res_img
+                elif isinstance(result, dict) and "path" in result:
+                    return result["path"]
+                return result
+
+            # Run with a 75 second timeout (first compilation takes longer, subsequent runs <15s)
+            result_path = await asyncio.wait_for(
+                loop.run_in_executor(None, call_local_gradio),
+                timeout=75.0
+            )
+            
+            if result_path and os.path.exists(result_path):
+                logger.info(f"Local M4 GPU VTON completed successfully! Result path: {result_path}")
+                return (result_path, "IDM-VTON (Yerel M4 GPU Donanımı)")
+            else:
+                raise Exception("Invalid or empty result from local VTON engine.")
+        except Exception as local_err:
+            logger.error(f"Local VTON Engine execution failed ({str(local_err)}). Trying public/local fallbacks...")
+
     # 2. LIVE HUGGING FACE API CALL
     if _GRADIO_AVAILABLE and Client is not None:
         try:
