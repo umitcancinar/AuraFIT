@@ -320,6 +320,11 @@ const historyModal = document.getElementById("history-modal");
 const btnCloseHistory = document.getElementById("btn-close-history");
 const historyItemsGrid = document.getElementById("history-items-grid");
 
+// Jury Modal DOM
+const juryModal = document.getElementById("jury-modal");
+const btnCloseJury = document.getElementById("btn-close-jury");
+const btnAgreeJury = document.getElementById("btn-agree-jury");
+
 // Language and Theme Selectors
 const btnThemeToggles = document.querySelectorAll(".btn-theme-toggle");
 const btnLangToggles = document.querySelectorAll(".btn-lang-toggle");
@@ -449,6 +454,13 @@ function setAuthenticatedUIState(name) {
     if (stateSuccess.classList.contains("hidden") && stateLoading.classList.contains("hidden")) {
         stateEmpty.classList.remove("hidden");
     }
+
+    // Show Jury Warning Pop-up with a premium smooth delay (once per session)
+    if (juryModal && !sessionStorage.getItem("juryAlertShown")) {
+        setTimeout(() => {
+            juryModal.classList.remove("hidden");
+        }, 800);
+    }
 }
 
 // Log Out Execution
@@ -490,6 +502,23 @@ btnCloseAuth.addEventListener("click", () => {
 authModal.addEventListener("click", (e) => {
     if (e.target === authModal) authModal.classList.add("hidden");
 });
+
+// Jury Alert Pop-up Modal Control
+if (btnCloseJury && btnAgreeJury && juryModal) {
+    const closeJuryAlert = () => {
+        juryModal.classList.add("hidden");
+        sessionStorage.setItem("juryAlertShown", "true");
+    };
+    
+    btnCloseJury.addEventListener("click", closeJuryAlert);
+    btnAgreeJury.addEventListener("click", closeJuryAlert);
+    juryModal.addEventListener("click", (e) => {
+        // Close if click is on the overlay backdrop (empty space)
+        if (e.target === juryModal) {
+            closeJuryAlert();
+        }
+    });
+}
 
 // Toggle Auth Tabs
 modalTabLogin.addEventListener("click", () => {
