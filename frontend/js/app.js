@@ -1003,10 +1003,26 @@ function initCompareSlider(containerId, afterWrapperId, sliderBarId) {
     
     if (!container || !afterWrapper || !sliderBar) return;
     
+    const afterImg = afterWrapper.querySelector("img");
     let isDragging = false;
     
     afterWrapper.style.width = "50%";
     sliderBar.style.left = "50%";
+    
+    const updateWidths = () => {
+        const containerWidth = container.getBoundingClientRect().width;
+        if (afterImg) {
+            afterImg.style.width = `${containerWidth}px`;
+            afterImg.style.maxWidth = "none";
+        }
+    };
+    
+    // Initial call and load binding
+    updateWidths();
+    if (afterImg) {
+        afterImg.addEventListener("load", updateWidths);
+    }
+    window.addEventListener("resize", updateWidths);
     
     const dragStart = () => { isDragging = true; };
     const dragEnd = () => { isDragging = false; };
@@ -1027,6 +1043,8 @@ function initCompareSlider(containerId, afterWrapperId, sliderBarId) {
         
         afterWrapper.style.width = `${percentage}%`;
         sliderBar.style.left = `${percentage}%`;
+        
+        updateWidths();
     };
     
     // Remove previous listeners to prevent leakage
