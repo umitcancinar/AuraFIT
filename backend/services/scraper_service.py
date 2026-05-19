@@ -173,12 +173,29 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         # Clean SEO junk from description
         description = clean_seo_text(description, seo_desc_patterns)
         
+        # Strip SKU/product codes (patterns like "50313713-VR046", "12345678" at end)
+        description = re.sub(r'\s+\d{5,}-?[A-Z0-9]*\s*$', '', description).strip()
+        description = re.sub(r'\s+\d{8,}\s*$', '', description).strip()
+        
+        # If description is essentially a repeat of the title, clear it
+        if title and description:
+            # Normalize both for comparison
+            norm_title = re.sub(r'[^a-zA-ZçğıöşüÇĞİÖŞÜ]', '', title.lower())
+            norm_desc = re.sub(r'[^a-zA-ZçğıöşüÇĞİÖŞÜ]', '', description.lower())
+            # If >70% of description words are in the title, it's a useless repeat
+            if norm_title and norm_desc and (norm_desc in norm_title or len(norm_desc) < len(norm_title) * 1.3):
+                description = ""
+        
         # If description is too short or generic after cleaning, try to find a better one
         if len(description) < 20:
             # Try finding product detail text in the page
-            detail_el = soup.find("div", class_="detail-desc-text") or soup.find("div", class_="product-description")
+            detail_el = soup.find("div", class_="detail-desc-text") or soup.find("div", class_="product-description") or soup.find("div", attrs={"class": re.compile(r"description", re.I)})
             if detail_el:
                 description = detail_el.get_text(strip=True)[:500]
+        
+        # Final fallback: leave empty string so the UI can handle it gracefully
+        if len(description) < 10:
+            description = ""
             
         # 3. Parse Price
         og_price = soup.find("meta", property="product:price:amount") or soup.find("meta", property="og:price:amount")
