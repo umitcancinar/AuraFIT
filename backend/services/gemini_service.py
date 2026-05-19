@@ -31,6 +31,25 @@ def get_model_name():
     # Attempt to use the latest Gemini 3 Flash model
     return "gemini-3-flash-preview"
 
+async def _gemini_generate_with_retry(model, content, max_retries=2, base_wait=40):
+    """
+    Wrapper that retries Gemini API calls on 429 (quota exceeded) errors.
+    Waits and retries up to max_retries times before raising.
+    """
+    import asyncio
+    for attempt in range(max_retries + 1):
+        try:
+            response = model.generate_content(content)
+            return response
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str and attempt < max_retries:
+                wait_time = base_wait * (attempt + 1)
+                logger.warning(f"Gemini 429 rate limit hit (attempt {attempt+1}/{max_retries+1}). Waiting {wait_time}s before retry...")
+                await asyncio.sleep(wait_time)
+            else:
+                raise
+
 async def optimize_vton_prompt(product_title: str, product_desc: str = "", extra_note: str = None) -> str:
     """
     Translates product details and extra notes into an English technical VTON prompt.
@@ -57,7 +76,7 @@ For example, "Red Oversized T-shirt" -> "A red oversized cotton t-shirt, plain s
 
 Return ONLY the plain text of the optimized English prompt. Do not include any quotes, markdown, or conversational filler.
 """
-        response = model.generate_content(prompt)
+        response = await _gemini_generate_with_retry(model, prompt)
         optimized_prompt = response.text.strip()
         logger.info(f"Optimized prompt generated: {optimized_prompt}")
         return optimized_prompt
@@ -151,7 +170,7 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
         }}
         """
         # Execute Gemini multi-modal generation
-        response = model.generate_content([prompt, user_img, product_img])
+        response = await _gemini_generate_with_retry(model, [prompt, user_img, product_img])
         response_text = response.text.strip()
         
         # Clean potential markdown JSON wrappers
@@ -296,7 +315,7 @@ Respond strictly in the language requested (TR for Turkish, EN for English).
 Do not output markdown code blocks. Just plain styling advice text.
 """
         prompt = f"{system_instruction}\nUser Message: {user_message}\nRequested Language: {lang.upper()}\nReply:"
-        response = model.generate_content(prompt)
+        response = await _gemini_generate_with_retry(model, prompt)
         return response.text.strip()
     except Exception as e:
         logger.error(f"Error in get_chatbot_reply: {str(e)}")
