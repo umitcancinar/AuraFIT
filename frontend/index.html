@@ -269,11 +269,23 @@
                     <label class="group-label"><span class="step-num">2</span> <span data-i18n="step2-label">Product Details</span></label>
                     
                     <!-- Premium Product Link Parser (Strategy 3) -->
-                    <div class="link-input-row" style="display: flex; gap: 8px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.06);">
-                        <input type="text" id="product-link-input" placeholder="Trendyol, H&M, Zara, Amazon linkini yapıştırın..." data-i18n-placeholder="placeholder-link-input" class="premium-input" style="flex: 1; margin: 0; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; color: #fff;">
-                        <button type="button" class="apple-btn-primary" id="btn-parse-link" style="padding: 10px 16px; font-weight: 600; font-family: 'Outfit', sans-serif; cursor: pointer; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border: none; background: linear-gradient(135deg, #0071e3, #00c6ff); color: white; transition: all 0.2s;">
-                            <span data-i18n="btn-parse-link">Çözümle</span> <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </button>
+                    <div class="link-input-row" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.03); padding: 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.07); box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-link" style="color: #ff9f0a; font-size: 0.95rem;"></i>
+                            <span style="font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.95); letter-spacing: 0.3px; text-transform: uppercase;">E-Ticaret Ürün Linki (İsteğe Bağlı)</span>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; width: 100%;">
+                            <input type="text" id="product-link-input" placeholder="Trendyol, H&M, Zara veya Amazon ürün linki yapıştırın..." data-i18n-placeholder="placeholder-link-input" class="premium-input" style="flex: 1; padding: 12px 16px; font-size: 0.85rem; border-radius: 12px; margin: 0; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,0.08); color: #fff; width: 100%; min-width: 0;">
+                            <button type="button" class="apple-btn-primary" id="btn-parse-link" style="padding: 12px 20px; font-weight: 600; font-family: 'Outfit', sans-serif; cursor: pointer; border-radius: 12px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: linear-gradient(135deg, #0071e3, #00c6ff); color: white; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);">
+                                <span data-i18n="btn-parse-link">Çözümle</span> <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </button>
+                        </div>
+                        
+                        <span style="font-family: 'Outfit', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.45); display: flex; align-items: center; gap: 5px;">
+                            <i class="fa-solid fa-circle-info" style="color: #ff9f0a; font-size: 0.8rem;"></i>
+                            <span>Link analiz edilerek kıyafet görselleri, adı, fiyatı ve kumaş detayları otomatik çekilir.</span>
+                        </span>
                     </div>
 
                     <!-- Scraped Multiple Images Carousel (Hidden by default, shown on successful parse) -->
