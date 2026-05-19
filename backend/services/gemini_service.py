@@ -260,9 +260,7 @@ Do not output markdown code blocks. Just plain styling advice text.
         response = await _gemini_generate_with_retry(model, prompt)
         return response.text.strip()
     except Exception as e:
-        logger.error(f"Error in get_chatbot_reply: {str(e)}")
-        if lang == "tr":
-            return "Merhaba! Harika bir stil için buradayım. Sanal kabine kıyafet yükleyerek veya link girerek Gemini analiziyle giydirmeyi anında başlatabiliriz!"
-        else:
-            return "Hello! I am here to help you design a gorgeous look. Let's upload clothes or paste links to start visual try-on immediately!"
+        error_msg = str(e)
+        logger.error(f"Error in get_chatbot_reply: {error_msg}")
+        return f"Sistem Hatası / System Error: {error_msg}"
 
