@@ -191,12 +191,13 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
         response = await _gemini_generate_with_retry(model, content_parts)
         response_text = response.text.strip()
         
-        # Clean potential markdown JSON wrappers
-        if response_text.startswith("```json"):
-            response_text = response_text[7:]
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-        response_text = response_text.strip()
+        # Robustly extract JSON using regex in case Gemini adds markdown or conversational text
+        import re
+        json_match = re.search(r'\{[\s\S]*\}', response_text)
+        if json_match:
+            response_text = json_match.group(0)
+        else:
+            raise ValueError(f"No JSON block found in Gemini response: {response_text[:100]}")
         
         # Parse JSON to verify correctness
         report_data = json.loads(response_text)
@@ -204,109 +205,38 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
         return report_data
         
     except Exception as e:
-        logger.error(f"Error in generate_styling_and_roi_report: {str(e)}")
-        # Reliable fallback JSON to prevent API failure from crashing the frontend
-        if lang == "en":
-            return {
-                "body_type": "Athletic / Standard",
-                "fit_analysis": {
-                    "score": 85,
-                    "title": "Harmonious Fit",
-                    "description": "The overall cut of the clothing seems highly compatible with your body structure. You can choose your regular size."
-                },
-                "styling_suggestions": [
-                    {
-                        "item": "Black Minimalist Slim Jeans",
-                        "description": "A great choice to balance the product's tone and achieve a clean, sleek look.",
-                        "category": "bottom"
-                    },
-                    {
-                        "item": "Classic White Canvas Sneakers",
-                        "description": "An ideal footwear choice to complete the sporty and chic stance.",
-                        "category": "shoes"
-                    },
-                    {
-                        "item": "Metallic Band Wristwatch",
-                        "description": "A silver or steel band watch will add elegance to the combination.",
-                        "category": "accessory"
-                    },
-                    {
-                        "item": "Black Faux Leather Jacket",
-                        "description": "Perfect to throw on for an evening outing or to catch a cooler vibe.",
-                        "category": "outerwear"
-                    }
-                ],
-                "color_harmony": "Perfect tone harmony. It matches your skin undertone and overall outfit palette exceptionally well.",
-                "financial_roi": {
-                    "price": price,
-                    "quality_rating": "⭐⭐⭐⭐ (4/5 - Good Quality)",
-                    "estimated_lifespan_wears": 80,
-                    "cost_per_wear_10": round(price / 10, 2),
-                    "cost_per_wear_30": round(price / 30, 2),
-                    "cost_per_wear_50": round(price / 50, 2),
-                    "roi_verdict": f"With a price tag of {price} TL, this item represents a logical financial wardrobe investment. The cost-per-wear drops quickly and it will match effortlessly with your wardrobe essentials."
-                },
-                "review_analysis": {
-                    "overall_sentiment": "94% of customers praised the fabric softness and stitching quality. Most buyers report a perfect fit and high versatility.",
-                    "highlights": [
-                        {
-                            "user": "John D.",
-                            "rating": 5,
-                            "comment": "The fit and stitching quality is outstanding. The thickness is absolutely perfect for daily use."
-                        },
-                        {
-                            "user": "Sarah M.",
-                            "rating": 5,
-                            "comment": "Super soft knitwear that stands firm. Highly versatile and matches all my basic denim."
-                        }
-                    ]
+        error_msg = str(e)
+        logger.error(f"Error in generate_styling_and_roi_report: {error_msg}")
+        # Inject the exact error into the UI so we can see why it failed!
+        return {
+            "body_type": f"Hata/Error: {error_msg}",
+            "fit_analysis": {
+                "score": 0,
+                "title": "Analiz Hatası",
+                "description": f"Yapay zeka analizi çöktü: {error_msg}"
+            },
+            "styling_suggestions": [
+                {
+                    "item": "Sistem Hatası",
+                    "description": "Lütfen tekrar deneyiniz.",
+                    "category": "bottom"
                 }
+            ],
+            "color_harmony": "Hata nedeniyle analiz edilemedi.",
+            "financial_roi": {
+                "price": price,
+                "quality_rating": "N/A",
+                "estimated_lifespan_wears": 0,
+                "cost_per_wear_10": 0,
+                "cost_per_wear_30": 0,
+                "cost_per_wear_50": 0,
+                "roi_verdict": "Hata"
+            },
+            "review_analysis": {
+                "overall_sentiment": "",
+                "highlights": []
             }
-        else:
-            return {
-                "body_type": "Atletik / Standart",
-                "fit_analysis": {
-                    "score": 85,
-                    "title": "Uyumlu Kesim",
-                    "description": "Kıyafetin genel kesimi vücut yapınızla son derece uyumlu görünüyor. Kendi bedeninizi tercih edebilirsiniz."
-                },
-                "styling_suggestions": [
-                    {
-                        "item": "Siyah Minimalist Jean Pantolon",
-                        "description": "Ürünün tonunu dengelemek ve temiz bir görünüm elde etmek için harika bir seçim.",
-                        "category": "bottom"
-                    },
-                    {
-                        "item": "Klasik Beyaz Kanvas Sneaker",
-                        "description": "Spor ve şık duruşu tamamlamak için ideal bir ayakkabı tercihi.",
-                        "category": "shoes"
-                    },
-                    {
-                        "item": "Metalik Kordonlu Kol Saati",
-                        "description": "Aksesuar olarak gümüş veya çelik kordonlu saatler kombine zenginlik katacaktır.",
-                        "category": "accessory"
-                    },
-                    {
-                        "item": "Siyah Suni Deri Ceket",
-                        "description": "Akşam şıklığı ve daha cool bir hava yakalamak için üzerinize alabilirsiniz.",
-                        "category": "outerwear"
-                    }
-                ],
-                "color_harmony": "Ürünün rengi ten tonunuzla oldukça iyi bir kontrast oluşturuyor ve enerjik bir duruş sergiliyor.",
-                "financial_roi": {
-                    "price": price,
-                    "quality_rating": "⭐⭐⭐⭐ (4/5 - İyi Kalite)",
-                    "estimated_lifespan_wears": 80,
-                    "cost_per_wear_10": round(price / 10, 2),
-                    "cost_per_wear_30": round(price / 30, 2),
-                    "cost_per_wear_50": round(price / 50, 2),
-                    "roi_verdict": f"Bu kıyafet {price} TL'lik fiyatıyla, giyim başına maliyet analizine göre oldukça mantıklı bir yatırım. Düzenli kullanıldığında kendini hızla amorti ediyor."
-                },
-                "review_analysis": {
-                    "overall_sentiment": "",
-                    "highlights": []
-                }
-            }
+        }
 
 async def get_chatbot_reply(user_message: str, lang: str = "tr") -> str:
     """
