@@ -289,7 +289,64 @@ const productImageInput = document.getElementById("product-image-input");
 const userUploadPreview = document.getElementById("user-upload-preview");
 const productUploadPreview = document.getElementById("product-upload-preview");
 const btnRemoveUserImg = document.getElementById("btn-remove-user-img");
-let scrapedProductReviews = null;
+let scrapedProductReviews = [];
+
+function isSeoJunkDescription(text) {
+    if (!text || text.length < 15) return true;
+    const lower = text.toLowerCase();
+    return (
+        lower.includes("yorumlarını inceleyin") ||
+        lower.includes("trendyol'a özel") ||
+        lower.includes("hemen alışverişe başla") ||
+        lower.includes("için tıkla") ||
+        lower.includes("indirimli fiyatlarla")
+    );
+}
+
+function isGeminiEmptyReviewMessage(msg) {
+    if (!msg) return true;
+    const m = msg.toLowerCase();
+    return (
+        m.includes("henüz gerçek müşteri yorumu bulunamadı") ||
+        m.includes("no real customer reviews found")
+    );
+}
+
+function renderReviewCommentCards(container, highlights) {
+    container.innerHTML = "";
+    highlights.forEach(h => {
+        const commentDiv = document.createElement("div");
+        commentDiv.className = "scraped-comment-item";
+        commentDiv.style.cssText = "padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); font-family: 'Outfit', sans-serif; font-size: 0.78rem;";
+        let starsHtml = "";
+        const rating = h.rating || 5;
+        for (let i = 1; i <= 5; i++) {
+            starsHtml += `<i class="fa-solid fa-star" style="color: ${i <= rating ? '#ff9f0a' : 'rgba(255,255,255,0.15)'}; font-size: 0.65rem;"></i>`;
+        }
+        commentDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-weight: 600; color: #fff;">${h.user || "Alıcı"}</span>
+                <div style="display: flex; gap: 2px;">${starsHtml}</div>
+            </div>
+            <p style="color: rgba(255,255,255,0.7); margin: 0; line-height: 1.3;">"${h.comment}"</p>
+        `;
+        container.appendChild(commentDiv);
+    });
+}
+
+function showParseLinkStatus(message, isError = false) {
+    let el = document.getElementById("parse-link-status");
+    if (!el && btnParseLink?.parentElement) {
+        el = document.createElement("div");
+        el.id = "parse-link-status";
+        el.style.cssText = "margin-top: 8px; font-size: 0.78rem; font-family: 'Outfit', sans-serif; line-height: 1.4;";
+        btnParseLink.parentElement.insertAdjacentElement("afterend", el);
+    }
+    if (el) {
+        el.style.color = isError ? "#ff6b6b" : "#4cd964";
+        el.innerHTML = message;
+    }
+}
 const btnRemoveProductImg = document.getElementById("btn-remove-product-img");
 
 // Manual Input Elements
@@ -726,7 +783,25 @@ if (btnParseLink) {
                 productTitle.value = data.title || "";
                 productPrice.value = data.price || "";
                 productDesc.value = data.description || "";
-                scrapedProductReviews = data.reviews || null;
+                scrapedProductReviews = Array.isArray(data.reviews) ? data.reviews : [];
+
+                const reviewCount = scrapedProductReviews.length;
+                const hasFabricInfo = data.description && (
+                    data.description.includes("%") ||
+                    data.description.toLowerCase().includes("içerik")
+                );
+                if (reviewCount > 0 || hasFabricInfo) {
+                    const parts = [];
+                    if (hasFabricInfo) parts.push(activeLang === "tr" ? "kumaş/içerik bilgisi güncellendi" : "fabric content updated");
+                    if (reviewCount > 0) parts.push(activeLang === "tr" ? `${reviewCount} gerçek yorum yüklendi` : `${reviewCount} real reviews loaded`);
+                    showParseLinkStatus(`✓ ${activeLang === "tr" ? "Link çözümlendi:" : "Link parsed:"} ${parts.join(", ")}. ${activeLang === "tr" ? "Şimdi sanal kabini başlatabilirsiniz." : "You can start the virtual try-on now."}`);
+                } else if (isSeoJunkDescription(data.description)) {
+                    showParseLinkStatus(activeLang === "tr"
+                        ? "⚠ Link çözüldü ancak kumaş/yorum bulunamadı. Farklı bir ürün linki deneyin."
+                        : "⚠ Link parsed but fabric/reviews not found. Try a different product URL.", true);
+                } else {
+                    showParseLinkStatus(activeLang === "tr" ? "✓ Ürün bilgileri güncellendi." : "✓ Product info updated.");
+                }
 
                 if (data.images && data.images.length > 0) {
                     scrapedImagesCarousel.innerHTML = "";
@@ -983,7 +1058,7 @@ btnSubmitTryon.addEventListener("click", async () => {
         formData.append("rating", pRating);
         formData.append("lang", activeLang);
         
-        if (scrapedProductReviews) {
+        if (scrapedProductReviews && scrapedProductReviews.length > 0) {
             formData.append("product_reviews", JSON.stringify(scrapedProductReviews));
         }
         
@@ -1137,36 +1212,28 @@ function renderReports(report, price) {
     const repReviewHighlights = document.getElementById("rep-review-highlights");
     
     if (repReviewSentiment && repReviewHighlights) {
-        const reviewAnalysis = report.review_analysis || {
-            overall_sentiment: activeLang === "tr" 
-                ? "Bu ürün grubu için genel müşteri geri bildirimleri kumaş kalitesi yönündedir." 
-                : "General customer reviews highlight the quality of the fabric.",
-            highlights: []
-        };
+        const reviewAnalysis = report.review_analysis || { overall_sentiment: "", highlights: [] };
         
-        repReviewSentiment.innerText = reviewAnalysis.overall_sentiment;
+        let highlights = reviewAnalysis.highlights || [];
+        let sentiment = reviewAnalysis.overall_sentiment || "";
+
+        if (
+            scrapedProductReviews.length > 0 &&
+            (!highlights.length || isGeminiEmptyReviewMessage(sentiment))
+        ) {
+            highlights = scrapedProductReviews.slice(0, 8);
+            sentiment = activeLang === "tr"
+                ? `E-ticaret sitesinden ${scrapedProductReviews.length} gerçek müşteri yorumu alındı. Öne çıkan yorumlar:`
+                : `${scrapedProductReviews.length} real customer reviews fetched from the store. Highlights:`;
+        }
+        
+        repReviewSentiment.innerText = sentiment || (activeLang === "tr"
+            ? "Bu ürün için henüz gerçek müşteri yorumu bulunamadı."
+            : "No real customer reviews found for this product yet.");
         repReviewHighlights.innerHTML = "";
         
-        if (reviewAnalysis.highlights && reviewAnalysis.highlights.length > 0) {
-            reviewAnalysis.highlights.forEach(h => {
-                const commentDiv = document.createElement("div");
-                commentDiv.className = "scraped-comment-item";
-                commentDiv.style.cssText = "padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); font-family: 'Outfit', sans-serif; font-size: 0.78rem;";
-                
-                let starsHtml = "";
-                for (let i = 1; i <= 5; i++) {
-                    starsHtml += `<i class="fa-solid fa-star" style="color: ${i <= h.rating ? '#ff9f0a' : 'rgba(255,255,255,0.15)'}; font-size: 0.65rem;"></i>`;
-                }
-                
-                commentDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <span style="font-weight: 600; color: #fff;">${h.user}</span>
-                        <div style="display: flex; gap: 2px;">${starsHtml}</div>
-                    </div>
-                    <p style="color: rgba(255,255,255,0.7); margin: 0; line-height: 1.3;">"${h.comment}"</p>
-                `;
-                repReviewHighlights.appendChild(commentDiv);
-            });
+        if (highlights.length > 0) {
+            renderReviewCommentCards(repReviewHighlights, highlights);
         } else {
             const emptyDiv = document.createElement("div");
             emptyDiv.style.cssText = "padding: 14px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); text-align: center; font-family: 'Outfit', sans-serif;";
