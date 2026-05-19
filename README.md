@@ -44,35 +44,6 @@ Sistem, en modern UI/UX prensipleriyle (Glassmorphism, Neon Blur, pürüzsüz an
 * **Auth:** Güvenli Stateless JWT ve bcrypt şifreleme.
 
 ---
-
-## 🚀 Kurulum ve Çalıştırma
-
-### Backend
-1. Repoyu klonlayıp backend klasörüne gidin:
-   ```bash
-   cd backend
-   ```
-2. Python sanal ortamınızı oluşturun ve aktifleştirin:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Gerekli kütüphaneleri (BeautifulSoup, httpx, google-genai vb.) indirin:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. `.env` dosyanızı oluşturup bilgileri (`GEMINI_API_KEY`, `DATABASE_URL`) doldurun ve sunucuyu başlatın:
-   ```bash
-   uvicorn main:app --reload --port 8000
-   ```
-
-### Frontend
-AuraFIT'in harika önyüzünü çalıştırmak için herhangi bir derleme aracına ihtiyacınız yoktur. Statik dosyaları herhangi bir web sunucusu ile ayağa kaldırabilirsiniz:
-```bash
-cd frontend
-python3 -m http.server 3000
-```
-Tarayıcınızdan `http://localhost:3000` adresine giderek sanal kabin keyfini yaşamaya başlayın!
-
+Geliştiren: Ümitcan ÇİNAR 
 ---
 *Tüm hakları saklıdır. Geleceğin akıllı alışveriş teknolojisi.*
