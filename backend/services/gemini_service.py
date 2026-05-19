@@ -66,7 +66,7 @@ Return ONLY the plain text of the optimized English prompt. Do not include any q
         # Simple fallback
         return f"A high-quality fashion garment, {product_title}"
 
-async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image_bytes: bytes, price: float, extra_note: str = None) -> dict:
+async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image_bytes: bytes, price: float, extra_note: str = None, lang: str = "tr") -> dict:
     """
     Analyzes user body type, clothing fit, styling harmony, and financial ROI using Gemini.
     """
@@ -78,8 +78,10 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
         product_img = Image.open(io.BytesIO(product_image_bytes))
         note_instruction = f"User's Extra Context/Note: {extra_note}" if extra_note else ""
         
+        prompt_lang = "ENGLISH" if lang == "en" else "TURKISH"
+        
         prompt = f"""
-Your task is to analyze the user's photo and the desired product photo to generate an English 'Fit, Styling, and Financial ROI' report.
+Your task is to analyze the user's photo and the desired product photo to generate a {prompt_lang} 'Fit, Styling, and Financial ROI' report.
 
 Inputs:
 1. User Photo (to understand body type, style, skin tone)
@@ -87,39 +89,39 @@ Inputs:
 3. Product Price: {price} USD/EUR (Treat as local currency)
 {note_instruction}
 
-Please perform your analysis entirely in ENGLISH and output strictly using the JSON schema below. Do not add any introductory or concluding text, and do NOT wrap the output in markdown code blocks. Output raw, valid JSON only.
+Please perform your analysis entirely in {prompt_lang} and output strictly using the JSON schema below. Do not add any introductory or concluding text, and do NOT wrap the output in markdown code blocks. Output raw, valid JSON only.
 
 JSON Schema:
 {{
   "body_type": "User's body type analysis (e.g., Athletic, Rectangle, Pear, Hourglass, etc.)",
   "fit_analysis": {{
     "score": 0 to 100 representing fit harmony (e.g., 85),
-    "title": "Fit Degree (e.g., Perfect Fit, Relaxed Fit, Tailored Fit)",
+    "title": "Fit Degree (e.g., Perfect Fit, Relaxed Fit, Tailored Fit in the requested language)",
     "description": "Detailed analysis of how the garment/item fits the user's specific body type or features. Include specific sizing advice considering the User's Extra Context/Note if applicable."
   }},
   "styling_suggestions": [
     {{
-      "item": "Complementary Item Name (e.g., Black Slim-Fit Jeans)",
-      "description": "Why this piece should be chosen, fabric and color harmony.",
+      "item": "Complementary Item Name (e.g., Black Slim-Fit Jeans in the requested language)",
+      "description": "Why this piece should be chosen, fabric and color harmony (in the requested language).",
       "category": "bottom"
     }},
     {{
-      "item": "Footwear (e.g., Minimalist White Leather Sneakers)",
-      "description": "Shoe style to complete the look.",
+      "item": "Footwear (e.g., Minimalist White Leather Sneakers in the requested language)",
+      "description": "Shoe style to complete the look (in the requested language).",
       "category": "shoes"
     }},
     {{
-      "item": "Accessory (e.g., Silver Metallic Watch)",
-      "description": "Accessory detail to add elegance.",
+      "item": "Accessory (e.g., Silver Metallic Watch in the requested language)",
+      "description": "Accessory detail to add elegance (in the requested language).",
       "category": "accessory"
     }},
     {{
-      "item": "Outerwear (e.g., Khaki Bomber Jacket)",
-      "description": "Complementary piece for colder weather.",
+      "item": "Outerwear (e.g., Khaki Bomber Jacket in the requested language)",
+      "description": "Complementary piece for colder weather (in the requested language).",
       "category": "outerwear"
     }}
   ],
-  "color_harmony": "Harmony degree and stylistic impact of the product's color based on the user's skin tone, hair color, and vibe.",
+  "color_harmony": "Harmony degree and stylistic impact of the product's color based on the user's skin tone, hair color, and vibe (in the requested language).",
   "financial_roi": {{
     "price": {price},
     "quality_rating": "Estimated fabric/build quality from the image (1 to 5 stars)",
@@ -127,7 +129,7 @@ JSON Schema:
     "cost_per_wear_10": Cost per wear if worn 10 times (price / 10),
     "cost_per_wear_30": Cost per wear if worn 30 times (price / 30),
     "cost_per_wear_50": Cost per wear if worn 50 times (price / 50),
-    "roi_verdict": "Short English advice on whether this is a logical financial wardrobe investment based on versatility and estimated longevity."
+    "roi_verdict": "Short advice on whether this is a logical financial wardrobe investment based on versatility and estimated longevity (in the requested language)."
   }}
 }}
 """
@@ -150,46 +152,88 @@ JSON Schema:
     except Exception as e:
         logger.error(f"Error in generate_styling_and_roi_report: {str(e)}")
         # Reliable fallback JSON to prevent API failure from crashing the frontend
-        return {
-            "body_type": "Atletik / Standart",
-            "fit_analysis": {
-                "score": 85,
-                "title": "Uyumlu Kesim",
-                "description": "Kıyafetin genel kesimi vücut yapınızla son derece uyumlu görünüyor. Kendi bedeninizi tercih edebilirsiniz."
-            },
-            "styling_suggestions": [
-                {
-                    "item": "Siyah Minimalist Jean Pantolon",
-                    "description": "Ürünün tonunu dengelemek ve temiz bir görünüm elde etmek için harika bir seçim.",
-                    "category": "bottom"
+        if lang == "en":
+            return {
+                "body_type": "Athletic / Standard",
+                "fit_analysis": {
+                    "score": 85,
+                    "title": "Harmonious Fit",
+                    "description": "The overall cut of the clothing seems highly compatible with your body structure. You can choose your regular size."
                 },
-                {
-                    "item": "Klasik Beyaz Kanvas Sneaker",
-                    "description": "Spor ve şık duruşu tamamlamak için ideal bir ayakkabı tercihi.",
-                    "category": "shoes"
-                },
-                {
-                    "item": "Metalik Kordonlu Kol Saati",
-                    "description": "Aksesuar olarak gümüş veya çelik kordonlu saatler kombine zenginlik katacaktır.",
-                    "category": "accessory"
-                },
-                {
-                    "item": "Siyah Suni Deri Ceket",
-                    "description": "Akşam şıklığı ve daha cool bir hava yakalamak için üzerinize alabilirsiniz.",
-                    "category": "outerwear"
+                "styling_suggestions": [
+                    {
+                        "item": "Black Minimalist Slim Jeans",
+                        "description": "A great choice to balance the product's tone and achieve a clean, sleek look.",
+                        "category": "bottom"
+                    },
+                    {
+                        "item": "Classic White Canvas Sneakers",
+                        "description": "An ideal footwear choice to complete the sporty and chic stance.",
+                        "category": "shoes"
+                    },
+                    {
+                        "item": "Metallic Band Wristwatch",
+                        "description": "A silver or steel band watch will add elegance to the combination.",
+                        "category": "accessory"
+                    },
+                    {
+                        "item": "Black Faux Leather Jacket",
+                        "description": "Perfect to throw on for an evening outing or to catch a cooler vibe.",
+                        "category": "outerwear"
+                    }
+                ],
+                "color_harmony": "Perfect tone harmony. It matches your skin undertone and overall outfit palette exceptionally well.",
+                "financial_roi": {
+                    "price": price,
+                    "quality_rating": "⭐⭐⭐⭐ (4/5 - Good Quality Cotton Blend)",
+                    "estimated_lifespan_wears": 80,
+                    "cost_per_wear_10": round(price / 10, 2),
+                    "cost_per_wear_30": round(price / 30, 2),
+                    "cost_per_wear_50": round(price / 50, 2),
+                    "roi_verdict": f"With a price tag of {price} TL, this item represents an extremely logical financial wardrobe investment. When worn regularly, the cost-per-wear drops to around {round(price / 30, 2)} TL, and it will quickly pay for itself by matching effortlessly with your wardrobe essentials."
                 }
-            ],
-            "color_harmony": "Ürünün rengi ten tonunuzla oldukça iyi bir kontrast oluşturuyor ve enerjik bir duruş sergiliyor.",
-            "financial_roi": {
-                "price": price,
-                "quality_rating": "⭐⭐⭐⭐ (4/5 - İyi Kalite Pamuk Karışımı)",
-                "estimated_lifespan_wears": 80,
-                "cost_per_wear_10": round(price / 10, 2),
-                "cost_per_wear_30": round(price / 30, 2),
-                "cost_per_wear_50": round(price / 50, 2),
-                "roi_verdict": f"Bu kıyafet {price} TL'lik fiyatıyla, giyim başına maliyet analizine göre oldukça mantıklı bir yatırım. Düzenli kullanıldığında giyim başı maliyeti {round(price / 30, 2)} TL seviyelerine düşüyor ve gardırobunuzdaki temel parçalarla rahatça eşleşerek kendini hızla amorti ediyor."
             }
-        }
+        else:
+            return {
+                "body_type": "Atletik / Standart",
+                "fit_analysis": {
+                    "score": 85,
+                    "title": "Uyumlu Kesim",
+                    "description": "Kıyafetin genel kesimi vücut yapınızla son derece uyumlu görünüyor. Kendi bedeninizi tercih edebilirsiniz."
+                },
+                "styling_suggestions": [
+                    {
+                        "item": "Siyah Minimalist Jean Pantolon",
+                        "description": "Ürünün tonunu dengelemek ve temiz bir görünüm elde etmek için harika bir seçim.",
+                        "category": "bottom"
+                    },
+                    {
+                        "item": "Klasik Beyaz Kanvas Sneaker",
+                        "description": "Spor ve şık duruşu tamamlamak için ideal bir ayakkabı tercihi.",
+                        "category": "shoes"
+                    },
+                    {
+                        "item": "Metalik Kordonlu Kol Saati",
+                        "description": "Aksesuar olarak gümüş veya çelik kordonlu saatler kombine zenginlik katacaktır.",
+                        "category": "accessory"
+                    },
+                    {
+                        "item": "Siyah Suni Deri Ceket",
+                        "description": "Akşam şıklığı ve daha cool bir hava yakalamak için üzerinize alabilirsiniz.",
+                        "category": "outerwear"
+                    }
+                ],
+                "color_harmony": "Ürünün rengi ten tonunuzla oldukça iyi bir kontrast oluşturuyor ve enerjik bir duruş sergiliyor.",
+                "financial_roi": {
+                    "price": price,
+                    "quality_rating": "⭐⭐⭐⭐ (4/5 - İyi Kalite Pamuk Karışımı)",
+                    "estimated_lifespan_wears": 80,
+                    "cost_per_wear_10": round(price / 10, 2),
+                    "cost_per_wear_30": round(price / 30, 2),
+                    "cost_per_wear_50": round(price / 50, 2),
+                    "roi_verdict": f"Bu kıyafet {price} TL'lik fiyatıyla, giyim başına maliyet analizine göre oldukça mantıklı bir yatırım. Düzenli kullanıldığında giyim başı maliyeti {round(price / 30, 2)} TL seviyelerine düşüyor ve gardırobunuzdaki temel parçalarla rahatça eşleşerek kendini hızla amorti ediyor."
+                }
+            }
 
 async def get_chatbot_reply(user_message: str, lang: str = "tr") -> str:
     """

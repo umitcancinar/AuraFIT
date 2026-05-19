@@ -391,6 +391,7 @@ async def try_on(
     price: float = Form(...),
     extra_note: Optional[str] = Form(None),
     rating: Optional[int] = Form(None),
+    lang: str = Form("tr"),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
@@ -439,7 +440,8 @@ async def try_on(
             user_image_bytes=user_bytes,
             product_image_bytes=product_bytes,
             price=price,
-            extra_note=extra_note
+            extra_note=extra_note,
+            lang=lang
         )
         
         # Gather results

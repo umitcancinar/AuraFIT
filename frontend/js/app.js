@@ -54,8 +54,7 @@ const translations = {
         "btn-submit-tryon": "SANAL KABİNİ BAŞLAT",
         "promo-badge": "Yapay Zeka Destekli Geleceğin E-Ticareti",
         "hero-main-title": "Geleceğin Akıllı E-Ticaret Kabini AuraFit ile Tanışın",
-        "promo-subtitle": "Sanal Giydirme Teknolojisi ve Gemini Akıllı Finansal CPW Analizi ile Akıllı E-Ticaret Çağını Keşfedin!",
-        "promo-tagline": "Kıyafet, ayakkabı veya gözlük... Siz hayal edin, yapay zekamızla anında üzerinizde görelim! 🕶️👟",
+        "promo-subtitle": "Beğendiğiniz ürünlerin üzerinizde nasıl duracağını anında görün, yapay zeka destekli akıllı kombin tavsiyeleri alın ve interaktif Cost-Per-Wear (Giyim Başına Maliyet) analiziyle gardırop bütçenizi en verimli şekilde planlayın. Geleceğin akıllı e-ticaret deneyimini AuraFit ile keşfedin!",
         "btn-start": "Sanal Kabini Keşfet",
         "btn-explore": "Sistemi İncele",
         "demo-title": "Önizleme Kabini",
@@ -168,8 +167,7 @@ const translations = {
         "btn-submit-tryon": "START VIRTUAL TRY-ON",
         "promo-badge": "AI-Powered Future of E-Commerce",
         "hero-main-title": "Future of E-Commerce: Meet AuraFit Smart Virtual Closet",
-        "promo-subtitle": "Explore the age of smart e-commerce with VTON virtual try-on and Gemini financial Cost-per-Wear ROI analysis!",
-        "promo-tagline": "Garments, footwear, or eyewear... You imagine it, and we'll dynamically try it on you in seconds! 🕶️👟",
+        "promo-subtitle": "Instantly visualize how your favorite clothes look on you, receive AI-powered personalization styling advice, and optimize your wardrobe budget with interactive Cost-Per-Wear (CPW) financial ROI analytics. Step into the future of intelligent shopping with AuraFit!",
         "btn-start": "Explore Virtual Closet",
         "btn-explore": "Explore System",
         "demo-title": "Preview Cabin",
@@ -844,6 +842,7 @@ btnSubmitTryon.addEventListener("click", async () => {
         const ratingInput = document.getElementById("product-rating");
         const pRating = ratingInput ? ratingInput.value : "4";
         formData.append("rating", pRating);
+        formData.append("lang", activeLang);
         
         if (userImageInput.files[0]) {
             formData.append("user_image", userImageInput.files[0]);
