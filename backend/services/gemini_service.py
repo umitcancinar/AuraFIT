@@ -31,10 +31,11 @@ def get_model_name():
     # Attempt to use the latest Gemini 3 Flash model
     return "gemini-3-flash-preview"
 
-async def _gemini_generate_with_retry(model, content, max_retries=2, base_wait=40):
+async def _gemini_generate_with_retry(model, content, max_retries=2, base_wait=2):
     """
     Wrapper that retries Gemini API calls on 429 (quota exceeded) errors.
     Waits and retries up to max_retries times before raising.
+    Fails fast if the daily quota is exhausted to prevent Vercel timeouts.
     """
     import asyncio
     for attempt in range(max_retries + 1):
@@ -43,10 +44,18 @@ async def _gemini_generate_with_retry(model, content, max_retries=2, base_wait=4
             return response
         except Exception as e:
             error_str = str(e)
-            if "429" in error_str and attempt < max_retries:
-                wait_time = base_wait * (attempt + 1)
-                logger.warning(f"Gemini 429 rate limit hit (attempt {attempt+1}/{max_retries+1}). Waiting {wait_time}s before retry...")
-                await asyncio.sleep(wait_time)
+            if "429" in error_str:
+                # If it's a daily quota limit, failing fast is required to not hang Vercel
+                if "GenerateRequestsPerDay" in error_str or "FreeTier" in error_str:
+                    logger.error("Gemini DAILY quota exceeded. Failing fast.")
+                    raise Exception("GEMINI_DAILY_QUOTA_EXCEEDED")
+                    
+                if attempt < max_retries:
+                    wait_time = base_wait * (attempt + 1)
+                    logger.warning(f"Gemini 429 rate limit hit (attempt {attempt+1}/{max_retries+1}). Waiting {wait_time}s before retry...")
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise
             else:
                 raise
 
