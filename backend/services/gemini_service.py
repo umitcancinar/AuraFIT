@@ -40,7 +40,8 @@ async def _gemini_generate_with_retry(model, content, max_retries=2, base_wait=2
     import asyncio
     for attempt in range(max_retries + 1):
         try:
-            response = model.generate_content(content)
+            # Using async generation is crucial for Vercel Serverless performance (prevents blocking)
+            response = await model.generate_content_async(content)
             return response
         except Exception as e:
             error_str = str(e)
@@ -178,8 +179,16 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
           }}
         }}
         """
+        
+        # Prevent Gemini from crashing by filtering out None values
+        content_parts = [prompt]
+        if user_img:
+            content_parts.append(user_img)
+        if product_img:
+            content_parts.append(product_img)
+            
         # Execute Gemini multi-modal generation
-        response = await _gemini_generate_with_retry(model, [prompt, user_img, product_img])
+        response = await _gemini_generate_with_retry(model, content_parts)
         response_text = response.text.strip()
         
         # Clean potential markdown JSON wrappers
@@ -294,19 +303,8 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
                     "roi_verdict": f"Bu kıyafet {price} TL'lik fiyatıyla, giyim başına maliyet analizine göre oldukça mantıklı bir yatırım. Düzenli kullanıldığında kendini hızla amorti ediyor."
                 },
                 "review_analysis": {
-                    "overall_sentiment": "Müşterilerin %94'ü kumaş yumuşaklığını ve dikiş kalitesini övdü. Kalıbın tam oturduğu ve son derece kullanışlı olduğu belirtiliyor.",
-                    "highlights": [
-                        {
-                            "user": "Gökhan K.",
-                            "rating": 5,
-                            "comment": "Kalıbı ve dikiş kalitesi harika. Kumaş kalınlığı mevsimlik kullanım için son derece ideal."
-                        },
-                        {
-                            "user": "Ebru S.",
-                            "rating": 5,
-                            "comment": "Kumaş dokusu çok yumuşak ve tok duruyor. Gardırobumdaki her jean ile uyum sağladı."
-                        }
-                    ]
+                    "overall_sentiment": "",
+                    "highlights": []
                 }
             }
 
