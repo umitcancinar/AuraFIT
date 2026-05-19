@@ -89,6 +89,230 @@ DEFAULT_MOCK = {
     ]
 }
 
+# Madmext (and similar Ticimax stores) load reviews via this public proxy + product barcode
+MADMEXT_REVIEWS_PROXY = "https://ai.beyazpapyon.com/comments/reviews-proxy.php"
+
+SEO_DESC_JUNK_PHRASES = (
+    "hemen alışverişe başla", "tıkla", "indirimli fiyatlarla", "yorumlarını inceleyin",
+    "kargo ücretsiz", "peşin fiyatına", "sepette %", "modelleri indirimli",
+    "hemen al", "keşfet", "online alışveriş", "en uygun fiyat", "güvenli alışveriş",
+    "hızlı teslimat", "için tıkla", ".com'da", ".com'da!",
+)
+
+MATERIAL_HINTS = (
+    "%", "pamuk", "cotton", "polyester", "polyamid", "viskoz", "keten", "yün",
+    "triko", "kumaş", "iplik", "lycra", "elastan", "naylon", "akrilik", "modal",
+    "ürün içeriği", "içerik",
+)
+
+
+def _is_seo_junk_description(text: str) -> bool:
+    if not text or len(text.strip()) < 10:
+        return True
+    lower = text.lower()
+    if any(phrase in lower for phrase in SEO_DESC_JUNK_PHRASES):
+        return True
+    if len(text) < 45 and not any(h in lower for h in MATERIAL_HINTS):
+        return True
+    return False
+
+
+def _format_product_description(text: str) -> str:
+    if not text:
+        return ""
+    cleaned = re.sub(r"\r\n?", "\n", text.strip())
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+
+    # Same line: "Ürün İçeriği - %80 POLIAMID %15 VISKOSE ..."
+    same_line = re.search(
+        r"(?:Ürün\s*İçeriği|Kumaş\s*İçeriği|Kumaş\s*Bilgisi|Malzeme)\s*[-:]\s*([^\n]+)",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    if same_line:
+        fabric = same_line.group(1).strip()
+        if "%" in fabric or len(fabric) > 10:
+            return f"Ürün içeriği: {fabric}"[:500]
+
+    # Any line with fabric percentages (Madmext, LCW, etc.)
+    for line in cleaned.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        lower = line.lower()
+        if re.search(r"\d+\s*%|%\s*\d+", line) and not any(
+            skip in lower for skip in ("model ölçü", "numune beden", "ürün kodu", "yıkay", "made in")
+        ):
+            if "ürün içeriği" in lower or "kumaş" in lower:
+                return line[:500]
+            return f"Ürün içeriği: {line}"[:500]
+
+    # Compact multi-line product detail block
+    compact = " | ".join(l.strip() for l in cleaned.split("\n") if l.strip())
+    return compact[:500]
+
+
+def _iter_json_ld_nodes(data: Any):
+    if isinstance(data, dict):
+        yield data
+        graph = data.get("@graph")
+        if isinstance(graph, list):
+            for item in graph:
+                yield from _iter_json_ld_nodes(item)
+    elif isinstance(data, list):
+        for item in data:
+            yield from _iter_json_ld_nodes(item)
+
+
+def _is_product_node(node: dict) -> bool:
+    node_type = node.get("@type")
+    if node_type == "Product":
+        return True
+    if isinstance(node_type, list):
+        return "Product" in node_type
+    return "Product" in str(node_type or "")
+
+
+def _parse_review_entry(r: dict) -> Optional[dict]:
+    author = r.get("author", {})
+    author_name = author.get("name") if isinstance(author, dict) else str(author or "")
+    review_body = (r.get("reviewBody") or r.get("comment") or "").strip()
+    review_rating = r.get("reviewRating", {})
+    rating_val = review_rating.get("ratingValue") if isinstance(review_rating, dict) else r.get("rate", 5)
+    if not review_body or len(review_body) < 4:
+        return None
+    try:
+        rating = int(float(rating_val)) if rating_val is not None else 5
+    except (TypeError, ValueError):
+        rating = 5
+    rating = max(1, min(5, rating))
+    return {
+        "user": author_name or "Alıcı",
+        "rating": rating,
+        "comment": review_body[:200],
+    }
+
+
+def _normalize_reviewer_name(user_name: str) -> str:
+    user_name = (user_name or "Alıcı").strip()
+    if "*" in user_name:
+        parts = [p for p in user_name.split() if p and p[0] != "*"]
+        if parts:
+            return f"{parts[0]} {parts[1][0]}." if len(parts) >= 2 else parts[0]
+    name_parts = user_name.split()
+    if len(name_parts) >= 2:
+        return f"{name_parts[0]} {name_parts[1][0]}."
+    return user_name
+
+
+def _parse_api_reviews(review_list: list, limit: int = 8) -> List[dict]:
+    parsed = []
+    for rv in review_list[:limit]:
+        if not isinstance(rv, dict):
+            continue
+        comment_text = (rv.get("comment") or rv.get("reviewBody") or "").strip()
+        if len(comment_text) < 4:
+            continue
+        parsed.append({
+            "user": _normalize_reviewer_name(rv.get("userFullName") or rv.get("user", "Alıcı")),
+            "rating": max(1, min(5, int(rv.get("rate") or rv.get("rating") or 5))),
+            "comment": comment_text[:200],
+        })
+    return parsed
+
+
+def _extract_json_ld_product(soup: BeautifulSoup) -> Dict[str, Any]:
+    result = {"description": "", "images": [], "reviews": [], "price": 0.0}
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            js_data = json.loads(script.string or "")
+        except Exception:
+            continue
+        for node in _iter_json_ld_nodes(js_data):
+            if not _is_product_node(node):
+                continue
+            desc = (node.get("description") or "").strip()
+            if desc and len(desc) > len(result["description"]):
+                result["description"] = desc
+            schema_imgs = node.get("image")
+            if isinstance(schema_imgs, list):
+                for s_img in schema_imgs:
+                    if isinstance(s_img, str) and s_img.startswith("http") and s_img not in result["images"]:
+                        result["images"].append(s_img)
+            elif isinstance(schema_imgs, str) and schema_imgs.startswith("http") and schema_imgs not in result["images"]:
+                result["images"].append(schema_imgs)
+            schema_reviews = node.get("review")
+            if schema_reviews:
+                items = schema_reviews if isinstance(schema_reviews, list) else [schema_reviews]
+                for r in items:
+                    if isinstance(r, dict):
+                        entry = _parse_review_entry(r)
+                        if entry:
+                            result["reviews"].append(entry)
+            offers = node.get("offers")
+            if result["price"] == 0.0 and offers:
+                offer = offers[0] if isinstance(offers, list) and offers else offers
+                if isinstance(offer, dict):
+                    try:
+                        result["price"] = float(str(offer.get("price", 0)).replace(",", "."))
+                    except (TypeError, ValueError):
+                        pass
+    return result
+
+
+def _extract_barcode_from_html(html_content: str) -> Optional[str]:
+    match = re.search(r"barcode\s*:\s*['\"](\d{10,14})['\"]", html_content, re.IGNORECASE)
+    return match.group(1) if match else None
+
+
+async def _fetch_madmext_reviews(barcode: str) -> List[dict]:
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.get(
+                MADMEXT_REVIEWS_PROXY,
+                params={"barcode": barcode},
+                headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
+            )
+        if resp.status_code != 200:
+            return []
+        payload = resp.json()
+        if not payload.get("success"):
+            return []
+        review_list = payload.get("data", {}).get("result", {}).get("reviews") or []
+        reviews = _parse_api_reviews(review_list, limit=8)
+        if reviews:
+            logger.info(f"Fetched {len(reviews)} real Madmext reviews for barcode {barcode}")
+        return reviews
+    except Exception as err:
+        logger.warning(f"Madmext review proxy fetch failed: {err}")
+        return []
+
+
+async def _fetch_trendyol_reviews(content_id: str) -> List[dict]:
+    api_urls = [
+        f"https://public-mdc.trendyol.com/discovery-web-socialgw-service/api/review/{content_id}?page=0&order=DESC&orderByField=LastModifiedDate",
+        f"https://apigw.trendyol.com/discovery-web-socialgw-service/api/review/{content_id}?page=0&order=DESC&orderByField=LastModifiedDate",
+    ]
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "application/json",
+    }
+    for api_url in api_urls:
+        try:
+            async with httpx.AsyncClient(timeout=6.0) as client:
+                resp = await client.get(api_url, headers=headers)
+            if resp.status_code != 200:
+                continue
+            review_list = resp.json().get("result", {}).get("productReviews", [])
+            reviews = _parse_api_reviews(review_list, limit=8)
+            if reviews:
+                logger.info(f"Fetched {len(reviews)} real Trendyol reviews for contentId {content_id}")
+                return reviews
+        except Exception as err:
+            logger.warning(f"Trendyol review API failed ({api_url}): {err}")
+    return []
+
+
 async def scrape_product_link(url: str) -> Dict[str, Any]:
     """
     Parses an e-commerce product URL to extract images, title, price, and descriptions.
@@ -113,7 +337,7 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
             "Cache-Control": "max-age=0"
         }
         
-        async with httpx.AsyncClient(timeout=6.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
             response = await client.get(url, headers=headers)
             
         if response.status_code != 200:
@@ -130,6 +354,12 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         images = []
         reviews = []
         
+        ld_product = _extract_json_ld_product(soup)
+        ld_description = ld_product["description"]
+        reviews.extend(ld_product["reviews"])
+        if ld_product["price"] > 0:
+            price = ld_product["price"]
+        
         # --- SEO JUNK PATTERNS TO STRIP ---
         seo_title_suffixes = [
             r'\s*-\s*Fiyat[ıi],?\s*Yorum(?:lar[ıi])?.*$',
@@ -139,6 +369,8 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
             r'\s*\|\s*H&M.*$',
             r'\s*-\s*LCW.*$',
             r'\s*-\s*Amazon.*$',
+            r'\s*-\s*Madmext.*$',
+            r'\s*\|\s*Madmext.*$',
             r'\s*yorumlar[ıi]n[ıi]\s+inceleyin.*$',
         ]
         seo_desc_patterns = [
@@ -165,13 +397,22 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         # Clean SEO junk from title
         title = clean_seo_text(title, seo_title_suffixes)
                 
-        # 2. Parse Description
+        # 2. Parse Description — JSON-LD has real fabric/material on Madmext & similar stores
         og_desc = soup.find("meta", property="og:description")
+        og_description = ""
         if og_desc and og_desc.get("content"):
-            description = og_desc.get("content").strip()
+            og_description = clean_seo_text(og_desc.get("content").strip(), seo_desc_patterns)
         
-        # Clean SEO junk from description
-        description = clean_seo_text(description, seo_desc_patterns)
+        if ld_description and not _is_seo_junk_description(ld_description):
+            description = ld_description
+        elif og_description and not _is_seo_junk_description(og_description):
+            description = og_description
+        elif ld_description:
+            description = ld_description
+        else:
+            description = og_description
+        
+        description = clean_seo_text(description, seo_desc_patterns) if description else ""
         
         # Strip SKU/product codes (patterns like "50313713-VR046", "12345678" at end)
         description = re.sub(r'\s+\d{5,}-?[A-Z0-9]*\s*$', '', description).strip()
@@ -180,25 +421,26 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         # If description is essentially a repeat of the title, clear it
         if title and description:
             # Normalize both for comparison
-            norm_title = re.sub(r'[^a-zA-ZçğıöşüÇĞİÖŞÜ]', '', title.lower())
-            norm_desc = re.sub(r'[^a-zA-ZçğıöşüÇĞİÖŞÜ]', '', description.lower())
+            norm_title = re.sub(r'[^a-zA-ZçğıöşüÇĞİÖŞÜ0-9%]', '', title.lower())
+            norm_desc = re.sub(r'[^a-zA-ZçğıöşüÇĞİÖŞÜ0-9%]', '', description.lower())
             # If >70% of description words are in the title, it's a useless repeat
-            if norm_title and norm_desc and (norm_desc in norm_title or len(norm_desc) < len(norm_title) * 1.3):
-                description = ""
+            if norm_title and norm_desc and (norm_desc in norm_title or (len(norm_desc) < len(norm_title) * 1.3 and "%" not in norm_desc)):
+                description = ld_description or ""
         
-        # If description is too short or generic after cleaning, try to find a better one
         if len(description) < 20:
-            # Try finding product detail text in the page
             detail_el = soup.find("div", class_="detail-desc-text") or soup.find("div", class_="product-description") or soup.find("div", attrs={"class": re.compile(r"description", re.I)})
             if detail_el:
-                description = detail_el.get_text(strip=True)[:500]
+                detail_text = detail_el.get_text(strip=True)
+                if detail_text and not _is_seo_junk_description(detail_text):
+                    description = detail_text[:500]
         
-        # Final fallback: leave empty string so the UI can handle it gracefully
-        if len(description) < 10:
-            description = ""
+        description = _format_product_description(description)
             
         # 3. Parse Price
-        og_price = soup.find("meta", property="product:price:amount") or soup.find("meta", property="og:price:amount")
+        if price == 0.0:
+            og_price = soup.find("meta", property="product:price:amount") or soup.find("meta", property="og:price:amount")
+        else:
+            og_price = None
         if og_price and og_price.get("content"):
             try:
                 price = float(og_price.get("content").replace(",", "."))
@@ -222,55 +464,11 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
             if main_img_url.startswith("http"):
                 images.append(main_img_url)
                 
-        # Second, extract images and reviews from JSON-LD schema
-        scripts = soup.find_all("script", type="application/ld+json")
-        for script in scripts:
-            try:
-                js_data = json.loads(script.string)
-                if isinstance(js_data, dict):
-                    # Schema Product type
-                    if js_data.get("@type") == "Product" or "Product" in str(js_data.get("@type")):
-                        schema_imgs = js_data.get("image")
-                        if isinstance(schema_imgs, list):
-                            for s_img in schema_imgs:
-                                if isinstance(s_img, str) and s_img.startswith("http") and s_img not in images:
-                                    images.append(s_img)
-                        elif isinstance(schema_imgs, str) and schema_imgs.startswith("http") and schema_imgs not in images:
-                            images.append(schema_imgs)
-                            
-                        # Extract reviews
-                        schema_reviews = js_data.get("review")
-                        if schema_reviews:
-                            if isinstance(schema_reviews, list):
-                                for r in schema_reviews:
-                                    if isinstance(r, dict):
-                                        author = r.get("author", {})
-                                        author_name = author.get("name") if isinstance(author, dict) else str(author)
-                                        review_body = r.get("reviewBody", "")
-                                        review_rating = r.get("reviewRating", {})
-                                        rating_val = review_rating.get("ratingValue") if isinstance(review_rating, dict) else 5
-                                        if review_body:
-                                            reviews.append({
-                                                "user": author_name or "Alıcı",
-                                                "rating": int(float(rating_val)) if rating_val else 5,
-                                                "comment": review_body[:150]
-                                            })
-                            elif isinstance(schema_reviews, dict):
-                                author = schema_reviews.get("author", {})
-                                author_name = author.get("name") if isinstance(author, dict) else str(author)
-                                review_body = schema_reviews.get("reviewBody", "")
-                                review_rating = schema_reviews.get("reviewRating", {})
-                                rating_val = review_rating.get("ratingValue") if isinstance(review_rating, dict) else 5
-                                if review_body:
-                                    reviews.append({
-                                        "user": author_name or "Alıcı",
-                                        "rating": int(float(rating_val)) if rating_val else 5,
-                                        "comment": review_body[:150]
-                                    })
-            except Exception:
-                pass
+        for s_img in ld_product["images"]:
+            if s_img not in images:
+                images.append(s_img)
                 
-        # Third, extract images from page tags as fallback
+        # Extract images from page tags as fallback
         img_tags = soup.find_all("img")
         for img in img_tags:
             src = img.get("src") or img.get("data-src") or img.get("original-src")
@@ -278,56 +476,22 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
                 # Filter out obvious small icons, avatars, or logos
                 if "logo" not in src.lower() and "icon" not in src.lower() and "avatar" not in src.lower() and src not in images:
                     # Target high-res images from CDN
-                    if any(cdn in src.lower() for cdn in ["trendyol", "hm.com", "zara", "amazon", "unsplash", "media", "upload"]):
+                    if any(cdn in src.lower() for cdn in ["trendyol", "hm.com", "zara", "amazon", "unsplash", "media", "upload", "madmext", "ticimax"]):
                         images.append(src)
                         
         # Ensure we filter out tiny or invalid URLs and cap at 5 premium images
         images = [img for img in images if len(img) > 10][:5]
         
-        # --- TRENDYOL-SPECIFIC REVIEW API ---
-        # Trendyol loads reviews via JS, not in static HTML. We call their public API directly.
         if not reviews and "trendyol.com" in url_lower:
-            try:
-                # Extract product contentId from URL pattern: -p-{contentId}
-                content_id_match = re.search(r'-p-(\d+)', url)
-                if content_id_match:
-                    content_id = content_id_match.group(1)
-                    review_api_url = f"https://public-mdc.trendyol.com/discovery-web-socialgw-service/api/review/{content_id}?page=0&order=DESC&orderByField=LastModifiedDate"
-                    
-                    async with httpx.AsyncClient(timeout=5.0) as review_client:
-                        review_resp = await review_client.get(review_api_url, headers={
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                            "Accept": "application/json",
-                        })
-                    
-                    if review_resp.status_code == 200:
-                        review_data = review_resp.json()
-                        review_list = review_data.get("result", {}).get("productReviews", [])
-                        
-                        for rv in review_list[:8]:  # Cap at 8 reviews
-                            user_name = rv.get("userFullName", "Alıcı")
-                            # Mask surname for privacy: "Ahmet K."
-                            name_parts = user_name.split()
-                            if len(name_parts) >= 2:
-                                user_name = f"{name_parts[0]} {name_parts[1][0]}."
-                            
-                            comment_text = rv.get("comment", "")
-                            star_rating = rv.get("rate", 5)
-                            
-                            if comment_text and len(comment_text.strip()) > 5:
-                                reviews.append({
-                                    "user": user_name,
-                                    "rating": int(star_rating),
-                                    "comment": comment_text.strip()[:200]
-                                })
-                        
-                        if reviews:
-                            logger.info(f"✅ Fetched {len(reviews)} real Trendyol reviews via API for contentId {content_id}")
-            except Exception as rev_err:
-                logger.warning(f"Trendyol review API fetch failed: {rev_err}")
+            content_id_match = re.search(r'-p-(\d+)', url)
+            if content_id_match:
+                reviews = await _fetch_trendyol_reviews(content_id_match.group(1))
         
-        # If no reviews parsed from dynamic page, leave empty — do NOT inject fake reviews
-        # Real reviews will only appear if the e-commerce site exposes them in JSON-LD schema
+        if not reviews and "madmext.com" in url_lower:
+            barcode = _extract_barcode_from_html(html_content)
+            if barcode:
+                reviews = await _fetch_madmext_reviews(barcode)
+        
         if not reviews:
             reviews = []
             
@@ -336,7 +500,7 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
             return {
                 "title": title[:200],  # Expanded character limit to prevent cutting off
                 "price": price if price > 0.0 else fallback_data["price"],
-                "description": description[:500] if description else fallback_data["description"],  # Expanded character limit
+                "description": description[:500] if description else "",
                 "images": images,
                 "reviews": reviews,
                 "source": "Canlı Çözümleme"
