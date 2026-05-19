@@ -669,46 +669,8 @@ productTemplates.forEach(card => {
 });
 
 /* ----------------------------------------------------
-   PRODUCT DETAILS TAB SWITCHING & LINK SCRAPER (Strategy 3)
+   PRODUCT DETAILS LINK SCRAPER (Strategy 3)
    ---------------------------------------------------- */
-const tabBtnLink = document.getElementById("tab-btn-link");
-const tabBtnManual = document.getElementById("tab-btn-manual");
-const panelLinkContent = document.getElementById("panel-link-content");
-const panelManualContent = document.getElementById("panel-manual-content");
-
-if (tabBtnLink && tabBtnManual) {
-    tabBtnLink.addEventListener("click", () => {
-        tabBtnLink.classList.add("active");
-        tabBtnLink.style.background = "rgba(255,255,255,0.05)";
-        tabBtnLink.style.borderColor = "rgba(255,255,255,0.1)";
-        tabBtnLink.style.color = "#fff";
-        
-        tabBtnManual.classList.remove("active");
-        tabBtnManual.style.background = "transparent";
-        tabBtnManual.style.borderColor = "transparent";
-        tabBtnManual.style.color = "rgba(255,255,255,0.5)";
-        
-        panelLinkContent.style.display = "block";
-        panelManualContent.style.display = "none";
-    });
-
-    tabBtnManual.addEventListener("click", () => {
-        tabBtnManual.classList.add("active");
-        tabBtnManual.style.background = "rgba(255,255,255,0.05)";
-        tabBtnManual.style.borderColor = "rgba(255,255,255,0.1)";
-        tabBtnManual.style.color = "#fff";
-        
-        tabBtnLink.classList.remove("active");
-        tabBtnLink.style.background = "transparent";
-        tabBtnLink.style.borderColor = "transparent";
-        tabBtnLink.style.color = "rgba(255,255,255,0.5)";
-        
-        panelManualContent.style.display = "block";
-        panelLinkContent.style.display = "none";
-        
-        selectedScrapedImageUrl = null;
-    });
-}
 
 const btnParseLink = document.getElementById("btn-parse-link");
 const productLinkInput = document.getElementById("product-link-input");
