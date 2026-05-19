@@ -139,17 +139,12 @@ async def generate_styling_and_roi_report(user_image_bytes: bytes, product_image
             "roi_verdict": "Short advice on whether this is a logical financial wardrobe investment based on versatility and estimated longevity (in the requested language)."
           }},
           "review_analysis": {{
-            "overall_sentiment": "Summary of customer reviews/comments sentiment and key feedback details (in the requested language). If no comments are provided, simulate a realistic sentiment based on typical reviews for this product category.",
+            "overall_sentiment": "Summary of customer reviews/comments sentiment and key feedback details (in the requested language). If no comments/reviews are provided, return exactly: 'Bu ürün için henüz gerçek müşteri yorumu bulunamadı.' for Turkish or 'No real customer reviews found for this product yet.' for English. Do NOT make up or simulate fake reviews.",
             "highlights": [
               {{
-                "user": "Customer username or generic name (e.g., Ahmet K.)",
-                "rating": 1 to 5 representing their product rating,
+                "user": "Customer username from the provided reviews. If no reviews were provided, return an EMPTY array [] for highlights.",
+                "rating": "1 to 5 representing their product rating",
                 "comment": "Highlight or summary of their comment (in the requested language)"
-              }},
-              {{
-                "user": "Another customer name (e.g., Merve Y.)",
-                "rating": 1 to 5,
-                "comment": "Another highlight or summary (in the requested language)"
               }}
             ]
           }}

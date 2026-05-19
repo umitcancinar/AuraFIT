@@ -231,9 +231,10 @@ async def scrape_product_link(url: str) -> Dict[str, Any]:
         # Ensure we filter out tiny or invalid URLs and cap at 5 premium images
         images = [img for img in images if len(img) > 10][:5]
         
-        # If no reviews parsed from dynamic page, load high-fidelity fallbacks
+        # If no reviews parsed from dynamic page, leave empty — do NOT inject fake reviews
+        # Real reviews will only appear if the e-commerce site exposes them in JSON-LD schema
         if not reviews:
-            reviews = fallback_data.get("reviews", DEFAULT_MOCK["reviews"])
+            reviews = []
             
         # If scraper found valid data, assemble it!
         if title and len(images) > 0:

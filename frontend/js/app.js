@@ -1167,6 +1167,16 @@ function renderReports(report, price) {
                 `;
                 repReviewHighlights.appendChild(commentDiv);
             });
+        } else {
+            const emptyDiv = document.createElement("div");
+            emptyDiv.style.cssText = "padding: 14px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); text-align: center; font-family: 'Outfit', sans-serif;";
+            emptyDiv.innerHTML = `
+                <i class="fa-solid fa-comment-slash" style="font-size: 1.2rem; color: rgba(255,255,255,0.3); margin-bottom: 6px;"></i>
+                <p style="color: rgba(255,255,255,0.5); margin: 4px 0 0; font-size: 0.8rem;">
+                    ${activeLang === "tr" ? "Bu ürün için e-ticaret sitesinde gerçek müşteri yorumu bulunamadı." : "No real customer reviews found on the e-commerce site for this product."}
+                </p>
+            `;
+            repReviewHighlights.appendChild(emptyDiv);
         }
     }
 }
