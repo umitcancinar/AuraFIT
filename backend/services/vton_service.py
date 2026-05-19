@@ -110,10 +110,9 @@ async def run_vton(user_image_path: str, product_image_path: str, prompt: str, u
         # We run this in an executor to avoid blocking the FastAPI event loop
         loop = asyncio.get_event_loop()
         
-        # Use freddyaboulton/IDM-VTON or yisol/IDM-VTON Space client
+        # Use yisol/IDM-VTON Space client for the absolute highest quality photorealistic results
         def call_gradio():
-            # freddyaboulton/IDM-VTON is highly optimized and active
-            client = Client("freddyaboulton/IDM-VTON")
+            client = Client("yisol/IDM-VTON")
             
             # Predict
             result = client.predict(
