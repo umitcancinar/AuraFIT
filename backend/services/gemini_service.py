@@ -28,8 +28,8 @@ else:
     logger.warning("GEMINI_API_KEY not found in environment variables!")
 
 def get_model_name():
-    # Attempt to use gemini-2.5-flash or gemini-2.0-flash
-    return "gemini-2.5-flash"
+    # Attempt to use the latest Gemini 3 Flash model
+    return "gemini-3-flash-preview"
 
 async def optimize_vton_prompt(product_title: str, product_desc: str = "", extra_note: str = None) -> str:
     """
