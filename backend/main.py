@@ -3,6 +3,9 @@ import sys
 import shutil
 import logging
 import asyncio
+import base64
+import io
+from PIL import Image
 
 # Setup workspace directories and sys.path for Vercel
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -391,6 +394,34 @@ def delete_all_history(current_user: User = Depends(get_current_user), db: Sessi
     db.commit()
     return {"status": "success", "message": "Tüm geçmiş başarıyla silindi."}
 
+def encode_image_to_base64_with_compression(file_path: str, max_size=(800, 800), quality=80) -> str:
+    """
+    Reads an image from file, compresses it to prevent database bloat,
+    and returns a Base64 data URI. Returns original path fallback if failed.
+    """
+    try:
+        # Ignore if it's already a web url or base64
+        if file_path.startswith("http") or file_path.startswith("data:"):
+            return file_path
+            
+        with Image.open(file_path) as img:
+            # Convert to RGB to prevent transparency issues with JPEG
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            # Resize while maintaining aspect ratio
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Save to bytes buffer
+            buffered = io.BytesIO()
+            img.save(buffered, format="JPEG", quality=quality)
+            
+            # Encode
+            img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            return f"data:image/jpeg;base64,{img_str}"
+    except Exception as e:
+        logger.error(f"Error base64 encoding image {file_path}: {e}")
+        return file_path
+
 @app.post("/api/try-on")
 async def try_on(
     user_image: UploadFile = File(...),
@@ -523,15 +554,19 @@ async def try_on(
 
         if current_user:
             logger.info(f"Persisting TryOn record for user '{current_user.username}' in PostgreSQL database...")
-            # We can save relative URLs
-            user_web_url = f"/uploads/{user_filename}"
-            product_web_url = f"/uploads/{product_filename}"
+            # Convert ephemeral /tmp paths to permanent Base64 strings for Neon DB
+            user_web_url = encode_image_to_base64_with_compression(user_path)
+            product_web_url = encode_image_to_base64_with_compression(product_path)
+            
+            # For the result image, try the actual VTON output path or the target copy
+            final_result_path = target_path if os.path.exists(target_path) else result_image_path
+            result_b64 = encode_image_to_base64_with_compression(final_result_path)
             
             new_record = TryOn(
                 user_id=current_user.id,
                 user_image_url=user_web_url,
                 product_image_url=product_web_url,
-                result_image_url=image_url,
+                result_image_url=result_b64,
                 product_title=product_title,
                 price=price,
                 styling_report=styling_report
