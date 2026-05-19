@@ -28,8 +28,8 @@ else:
     logger.warning("GEMINI_API_KEY not found in environment variables!")
 
 def get_model_name():
-    # Use the stable Gemini 1.5 Flash model
-    return "gemini-1.5-flash"
+    # Attempt to use the latest Gemini 3 Flash model
+    return "gemini-3-flash-preview"
 
 async def _gemini_generate_with_retry(model, content, max_retries=2, base_wait=2):
     """
