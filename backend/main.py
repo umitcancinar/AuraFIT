@@ -88,7 +88,7 @@ try:
     logger.info("✅ vton_service imported successfully")
 except Exception as _import_err:
     logger.error(f"⚠️ vton_service import failed: {_import_err}")
-    async def run_vton(*args, **kwargs): raise Exception("VTON servisi şu anda kullanılamıyor.")
+    async def run_vton(*args, **kwargs): return (kwargs.get('user_image_path', ''), 'Motor Kullanılamıyor (Import Hatası)')
 
 from services.db_service import (
     get_db, init_db, hash_password, verify_password, 
@@ -103,37 +103,52 @@ async def serve_uploads(file_path: str):
     Custom endpoint to serve uploads and pre-rendered assets.
     This guarantees 100% reliability on Vercel where StaticFiles mounting is restricted.
     """
-    # 1. Try local/temp uploads directory
+    # 1. Try local/temp uploads directory (exact path)
     local_path = os.path.join(UPLOADS_DIR, file_path)
     if os.path.exists(local_path):
         return FileResponse(local_path)
         
     filename = os.path.basename(file_path)
+    
+    # 2. Check for VTON result templates in filename
+    result_template_map = {
+        "result_man_blue_hoodie": "result_man_blue_hoodie.jpg",
+        "result_woman_red_sweater": "result_woman_red_sweater.jpg",
+        "result_woman_green_dress": "result_woman_green_dress.jpg",
+    }
+    for key, asset_name in result_template_map.items():
+        if key in filename:
+            asset_file = os.path.join(ASSETS_DIR, asset_name)
+            if os.path.exists(asset_file):
+                logger.info(f"Serving pre-rendered VTON result template: {asset_name}")
+                return FileResponse(asset_file)
 
-    # 2. Check for quick templates in filename to handle Vercel's ephemeral /tmp storage
-    if "model_man" in filename:
-        return FileResponse(os.path.join(ASSETS_DIR, "model_man.jpg"))
-    if "model_woman" in filename:
-        return FileResponse(os.path.join(ASSETS_DIR, "model_woman.jpg"))
-    if "garment_blue_hoodie" in filename:
-        return FileResponse(os.path.join(ASSETS_DIR, "garment_blue_hoodie.jpg"))
-    if "garment_red_sweater" in filename:
-        return FileResponse(os.path.join(ASSETS_DIR, "garment_red_sweater.jpg"))
-    if "garment_green_dress" in filename:
-        return FileResponse(os.path.join(ASSETS_DIR, "garment_green_dress.jpg"))
-    if "garment_blue_jacket" in filename:
-        return FileResponse(os.path.join(ASSETS_DIR, "garment_blue_jacket.jpg"))
+    # 3. Check for quick model/garment templates in filename to handle Vercel's ephemeral /tmp storage
+    template_map = {
+        "model_man": "model_man.jpg",
+        "model_woman": "model_woman.jpg",
+        "garment_blue_hoodie": "garment_blue_hoodie.jpg",
+        "garment_red_sweater": "garment_red_sweater.jpg",
+        "garment_green_dress": "garment_green_dress.jpg",
+        "garment_blue_jacket": "garment_blue_jacket.jpg",
+    }
+    for key, asset_name in template_map.items():
+        if key in filename:
+            asset_file = os.path.join(ASSETS_DIR, asset_name)
+            if os.path.exists(asset_file):
+                return FileResponse(asset_file)
         
-    # 3. Try backend assets directory (for fallback templates)
+    # 4. Try backend assets directory (for fallback templates)
     asset_path = os.path.join(ASSETS_DIR, filename)
     if os.path.exists(asset_path):
         return FileResponse(asset_path)
         
-    # 4. Try standard assets directory
+    # 5. Try standard assets directory
     fallback_asset_path = os.path.join(BASE_DIR, "assets", filename)
     if os.path.exists(fallback_asset_path):
         return FileResponse(fallback_asset_path)
-        
+    
+    logger.warning(f"File not found in any location: {file_path} (filename: {filename})")
     raise HTTPException(status_code=404, detail="File not found")
 
 # Global Exception Handler to ensure 100% JSON error responses (prevents HTML crash pages on Vercel)

@@ -922,6 +922,12 @@ btnSubmitTryon.addEventListener("click", async () => {
 btnResetTryon.addEventListener("click", () => {
     stateSuccess.classList.add("hidden");
     stateEmpty.classList.remove("hidden");
+    
+    // Hide engine badge and experimental toolbar
+    const engineBadge = document.getElementById("vton-engine-badge");
+    if (engineBadge) engineBadge.style.display = "none";
+    const expToolbar = document.getElementById("experimental-toolbar");
+    if (expToolbar) expToolbar.style.display = "none";
 });
 
 /* ----------------------------------------------------
